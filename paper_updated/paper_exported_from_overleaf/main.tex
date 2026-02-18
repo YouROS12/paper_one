@@ -1,0 +1,410 @@
+\documentclass[preprint,12pt]{elsarticle}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{graphicx}
+\usepackage{xurl}           % Allows URLs to break at any character
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    breaklinks=true         % Allow links to break across lines
+}
+\usepackage{pdflscape}
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    left=2cm,
+    right=2cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+% Make [H] work properly
+\usepackage{float}
+\floatplacement{figure}{H}
+\floatplacement{table}{H}
+
+\journal{Computers and Electronics in Agriculture}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{A Resource-Efficient Framework for Plant Disease Classification: Integrating Reduced-Order Modelling with Treatment-Based Label Engineering}
+
+\author[1]{Youssef Natij\corref{cor1}}
+\ead{youssef.natij@uit.ac.ma}
+
+\author[3]{Hajar El Karch}
+\ead{hajar.elkarch@uit.ac.ma}
+
+\author[1]{Abdelmounaim Belaaribi}
+\ead{abdelmounaim.belaaribi@uit.ac.ma}
+
+\author[1]{Oumaima Lanaya}
+\ead{oumayma.lanaya@uit.ac.ma}
+
+\author[1]{Meriem El Atik}
+\ead{meriem.elatik@uit.ac.ma}
+
+\author[2]{Ayyad Maafiri}
+\ead{a.maafiri@uca.ac.ma}
+
+\author[1]{Abdelkader Mezouari}
+\ead{abdelkader.mezouari1@uit.ac.ma}
+
+\cortext[cor1]{Corresponding author}
+
+\affiliation[1]{organization={Scientific Research and Innovation Laboratory, Higher School Of Technology, Ibn Tofail University},
+                city={Kénitra},
+                country={Morocco}}
+
+\affiliation[2]{organization={LMC, Polydisciplinary Faculty of Safi, Cadi Ayyad University},
+                city={Safi},
+                country={Morocco}}
+
+\affiliation[3]{organization={Laboratory of Advanced Systems Engineering, National School of Applied Sciences, Ibn Tofail University},
+                city={Kénitra},
+                country={Morocco}}
+
+\begin{abstract}
+Automated plant disease diagnosis in field settings is difficult due to subtle symptoms, strong inter-class similarity, and class imbalance. While Deep Learning models offer high accuracy, a critical engineering gap remains: standard architectures are often too computationally expensive for widespread deployment. There is a pressing need for algorithmic solutions that decouple feature quality from computational weight. This study addresses this by investigating whether aggressive dimensionality reduction can maintain high predictive performance while drastically reducing computational complexity, thereby facilitating future deployment on limited-resource hardware. We propose a hybrid Reduced-Order Modelling (ROM) framework that utilizes a YOLOv8m backbone for spatially-aware feature extraction, compressed via Principal Component Analysis (PCA) to retain only the most discriminative signals, followed by lightweight classical classification. A key contribution is a treatment-centered label engineering strategy that consolidates 115 PlantWildV2 classes into 11 agronomically actionable categories. Our experiments show that a highly compressed feature space serves as an effective regularizer: performance peaks at 100 principal components and declines as dimensionality increases. On the PlantWildV2 test set, a tuned Support Vector Classifier (SVC) trained on these 100 components achieves a test accuracy of \textbf{87.52\%} and a macro F1-score of \textbf{0.882} under the treatment-based grouping, outperforming XGBoost, MLP, and Random Forest. This modular pipeline achieves higher accuracy than an end-to-end EfficientNet-B0 baseline (87.52\% vs 82.50\%) while reducing retraining time from 5.8 hours (GPU) to 30.8 seconds (CPU). This \textbf{$\sim$670$\times$} efficiency gain demonstrates the viability of Reduced-Order Modelling for resource-constrained deployment, offering a superior balance of accuracy and computational cost.
+\end{abstract}
+
+\begin{keyword}
+Plant Disease Classification \sep Reduced-Order Modelling \sep YOLOv8 \sep Principal Component Analysis (PCA) \sep Label Engineering \sep Computational Efficiency \sep Resource-Efficient AI
+\end{keyword}
+
+\end{frontmatter}
+
+\section{Introduction}
+\label{sec:intro}
+
+The global agricultural sector, essential for food security and livelihoods, is increasingly adopting artificial intelligence to protect yields and improve disease management. Traditional plant disease diagnosis relies on expert visual inspection and is labor intensive, subjective, and difficult to scale. Annual crop losses from plant diseases are estimated to exceed \$220 billion \cite{c2022acomprehensivereview, barbedo2019plantdiseaseidentification}. With advances in Deep Learning (DL), especially Convolutional Neural Networks (CNNs), automated disease classification from images has progressed markedly. These models extract high-level features and achieve strong accuracy on benchmark datasets collected under controlled laboratory conditions \cite{hassan2021identificationofplantleaf, lu2021reviewonconvolutional}.
+
+However, performance drops when models are deployed on large, heterogeneous datasets captured in field conditions \cite{liu2021plantdiseasesand, mdpiEvaluatingImpactsLabField, richter2025assessingtheperformance}. Field imagery is complex: low-intensity differences between healthy tissue and early-stage symptoms are difficult to detect \cite{albattah2022anoveldeep, barbedo2019plantdiseaseidentification}. High inter-class similarity and large intra-class variance, both prominent in PlantWildV2, further complicate recognition \cite{MVPDR, wu2023fromlaboratoryto}. Severe class imbalance is also common in agricultural datasets, biasing models toward prevalent diseases and reducing performance on rarer yet important pathologies \cite{jafar2024revolutionizingagriculturewith, barbedo2019plantdiseaseidentification}.
+
+State-of-the-art DL models also demand substantial computation. Architectures such as VGG \cite{simonyan2014very}, ResNet \cite{he2016deep}, and DenseNet \cite{huang2017densely} contain millions of parameters and require high-end hardware for training and inference \cite{c2022acomprehensivereview, hassan2021identificationofplantleaf}. This cost increases energy usage and latency and limits deployment on Edge AI devices where timely, on-field diagnosis is needed. Resource constraints, especially in smallholder settings, remain a significant barrier to adoption \cite{demilie2024plantdiseasedetection}.
+
+To address both performance and computational efficiency, we investigate a hybrid DL-ML architecture that decouples feature extraction from classification. Such systems leverage robust deep representations while using lightweight classical machine learning for prediction \cite{islam2022multimodalhybriddeep, demilie2024plantdiseasedetection}. We propose, to our knowledge, the first use of a YOLOv8m backbone as a feature extractor for plant disease classification. Our hypothesis is that the YOLOv8 backbone, optimized for localization, yields richer representations of localized symptoms (e.g., spots, lesions) than standard classification backbones.
+
+While Deep Learning models offer high accuracy, a critical engineering gap remains: standard architectures are often too computationally expensive for widespread deployment. There is a pressing need for algorithmic solutions that decouple feature quality from computational weight. This study addresses this by investigating whether aggressive dimensionality reduction can maintain high predictive performance while drastically reducing computational complexity, thereby facilitating future deployment on limited-resource hardware.
+
+This work makes three contributions: (1) it demonstrates the efficacy of the YOLOv8m backbone as a feature generator for challenging, in-the-wild plant disease recognition; (2) it introduces a treatment-based label engineering strategy that consolidates 115 fine-grained classes into 11 actionable categories, improving accuracy and generalization; and (3) it identifies an effective pipeline (YOLOv8 features + PCA + tuned SVC) that achieves high accuracy with low computational overhead, supporting future implementation in resource-constrained environments.
+
+\section{Related Work}
+\label{sec:related_work}
+
+Automated plant disease classification has evolved with developments in computer vision and machine learning. Our work builds on research addressing the limitations of DL in agriculture and on hybrid models designed to mitigate these issues.
+
+\subsection{Deep Learning for Plant Disease Recognition}
+Convolutional Neural Networks (CNNs) have become the standard for disease diagnosis. Early works utilizing architectures like VGG and ResNet achieved high accuracy on the PlantVillage dataset \cite{hughes2016openaccessrepositoryimages, hassan2021identificationofplantleaf}. Recent studies have focused on improving field robustness. For instance, Salman et al. \cite{salman2025plantdiseaseclassification} proposed a Vision Transformer (ViT) with a Mixture of Experts (MoE) to bridge the lab-to-field generalization gap, explicitly addressing covariate shift. Similarly, Wu et al. \cite{wu2023fromlaboratoryto} introduced an unsupervised domain adaptation method (MSUN) to align feature distributions between lab and field domains. Detection-based approaches have also gained traction; Pan et al. \cite{pan2023xooyoloadetection} developed Xoo-YOLO, a YOLOv8 variant optimized for UAV-based bacterial blight detection, demonstrating the efficacy of object detection backbones in agriculture.
+
+
+
+
+
+\subsection{Resource-Constrained and Edge AI}
+Despite accuracy gains, standard DL models are often too computationally heavy for edge deployment. To address this, recent research emphasizes efficiency. Nyakuri et al. \cite{nyakuri2025aiandiotpowered} developed Tiny-LiteNet, a distilled lightweight CNN deployed on Raspberry Pi 5 for real-time pest and disease detection. Bhavani and Chalapathi \cite{bhavani2026lightweightscalabledeep} proposed a lightweight SSD framework for real-time potato disease detection, highlighting the importance of managing computational cost without sacrificing lesion-level accuracy. Our work aligns with this trend but takes a different approach: rather than scaling down a CNN, we use a frozen, high-capacity backbone (YOLOv8) coupled with aggressive dimensionality reduction to achieve extreme efficiency.
+
+\subsection{Data Challenges and Label Engineering}
+The quality of training data remains a bottleneck. Richter and Kim \cite{richter2025assessingtheperformance} recently benchmarked transfer learning across 18 datasets, identifying dataset bias and lack of field realism as major limitations. Recognizing the difficulty of manual annotation in broad-acre crops, Mullins et al. \cite{mullins2024leveragingzeroshotdetection, mullins2025enhancedimageannotation} explored zero-shot detection and segmentation (e.g., Grounding DINO, SAM2) to accelerate dataset creation. In this study, we address data quality through \textit{label engineering}, consolidating standard taxonomic classes into treatment-based categories to reduce ambiguity and improve clinical relevance.
+
+\subsection{Our Contribution in Context}
+Recent studies have explored end-to-end fine-tuning of YOLOv8 for plant disease tasks \cite{frontiersSerpensGateYOLOv8}. However, the use of YOLOv8 backbone features in a hybrid classification pipeline has not been systematically examined. We address this gap. We hypothesize that feature hierarchies from object detection models, optimized for localization, better capture localized disease patterns. We evaluate YOLOv8-derived features for downstream classification, contributing evidence on repurposing modern detection backbones for transfer learning in challenging agricultural domains.
+
+\section{Methodology}
+\label{sec:methodology}
+
+We designed the methodology to evaluate a two-stage classification pipeline against an end-to-end baseline, with emphasis on the impact of the proposed label engineering strategy. Figure~\ref{fig:system_architecture} shows the workflow from data ingestion to evaluation, and Algorithm~\ref{alg:pipeline} presents the formal steps.
+
+\begin{algorithm}
+\caption{Two-Stage Pipeline: Feature Engineering and Classifier Training}
+\label{alg:pipeline}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Raw training images $\mathcal{I}_{train}$, corresponding labels $\mathcal{Y}_{train}$, raw test images $\mathcal{I}_{test}$.
+\State \textbf{Output:} A trained and tuned classifier $\mathcal{C}_{final}$, performance metrics (Accuracy, F1-Score).
+
+\Statex
+\Statex \textit{//--- Phase 1: Feature Engineering \& Dimensionality Reduction ---}
+\State Load pre-trained backbone $\mathcal{M}$ (YOLOv8m, ResNet50, or EfficientNet-B0).
+\State Generate feature bank $\mathcal{F}_{train}$ by processing each image in $\mathcal{I}_{train}$ through $\mathcal{M}$ and flattening the activation maps.
+\State Generate feature bank $\mathcal{F}_{test}$ from $\mathcal{I}_{test}$ using the same process.
+\State Fit compression transformer $\mathcal{T}$ (IPCA or TruncatedSVD) on $\mathcal{F}_{train}$ to obtain latent features.
+\State Determine optimal $n$ via ablation (Experiment 1); set $n^{*} = 100$.
+\State $\mathcal{X}_{train} \gets \text{Transform}(\mathcal{T}, \mathcal{F}_{train}, n^{*})$
+\State $\mathcal{X}_{test} \gets \text{Transform}(\mathcal{T}, \mathcal{F}_{test}, n^{*})$
+
+\Statex
+\Statex \textit{//--- Phase 2: Classifier Training \& Evaluation ---}
+\State Define a classifier $\mathcal{C}$ (SVC).
+\State Train the classifier $\mathcal{C}_{final}$ on the full $\mathcal{X}_{train}$ and $\mathcal{Y}_{train}$.
+\State Make predictions on the unseen test data:
+\State $\mathcal{Y}_{pred} \gets \mathcal{C}_{final}.\text{predict}(\mathcal{X}_{test})$
+\State Evaluate the model by comparing $\mathcal{Y}_{pred}$ with the true test labels $\mathcal{Y}_{test}$.
+\State \textbf{return} $\mathcal{C}_{final}$, Performance Metrics
+\end{algorithmic}
+\end{algorithm}
+
+\begin{landscape}
+\begin{figure}
+ \centering
+  \includegraphics[width=\linewidth,height=0.85\textheight,keepaspectratio]{diagram.png}
+  \caption{System architecture of the proposed two-stage classification pipeline.}
+  \label{fig:system_architecture}
+\end{figure}
+\end{landscape}
+\subsection{Dataset}
+
+We use the PlantWildV2 dataset, a large-scale benchmark for in-the-wild plant disease recognition. It contains 11,349 images across 115 disease classes, with predefined training and test splits used without modification. Table~\ref{tbl:dataset_description} summarizes key statistics, and Figure~\ref{fig:inter_class} illustrates intra-class variability and inter-class similarity. We selected this dataset to approximate real-world agricultural conditions and avoid limitations of many lab-based datasets.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{image.png}
+    \caption{Illustration of intra-class variance and inter-class similarity among plant disease images (right), alongside the dataset with the highest volume of in-the-wild images (left).}
+    \label{fig:inter_class}
+\end{figure}
+
+Performance on in-the-wild data is affected by complex, noisy backgrounds, unlike lab datasets with uniform backgrounds. A critical issue is dataset bias, which can inflate reported performance. This bias is well documented in PlantVillage. In a key study, \cite{noyan2022uncovering} trained a model using only eight background pixels from PlantVillage images and achieved 49.0\% accuracy on the held-out test set, compared to a random-guess baseline of 2.6\%.
+
+To validate the robustness of PlantWildV2, we replicated this 8-pixel background bias experiment. Our analysis yielded a background-only accuracy of 12.87\% (vs. a random baseline of 0.85\%). While this indicates some residual correlation between field conditions and disease type, it represents a substantial reduction in bias compared to the $\sim$49\% benchmark of laboratory datasets. We therefore rely on PlantWildV2 to minimize spurious cues and develop a model robust for practical use.
+
+\begin{table}
+    \caption{A summary of popular plant disease datasets.}
+    \label{tab:popular_datasets}
+    \centering
+    \begin{tabular}{l c c c l}
+        \toprule
+        \textbf{Dataset} & \textbf{Plant} & \textbf{Size} & \textbf{Resolution} & \textbf{Setting} \\
+        \midrule 
+        \cite{fenu2021using} & Pear & 3,505 & Multiple & Field \\	 
+        \cite{krohling2019bracol} & Coffee & 4,407 & 2048×1024 & Lab \\	
+        \cite{parraga2019rocole} & Coffee & 1,560 & Multiple & Field \\	
+        \cite{thapa2020plant} & Apple & 3,651 & 2048×1365 & Field \\			 
+        \cite{prajapati2017detection} & Rice & 120 & 2848×4288 & Lab \\	
+        \cite{rauf2019citrus} & Citrus & 759 & 256×256 & Lab \\ 
+        \cite{hughes2015open} & Multiple & 54,309 & Multiple & Lab \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}
+\caption{PlantWildV2 Dataset Description.}
+\label{tbl:dataset_description}
+\centering
+\begin{tabular}{lcc}
+\toprule
+ & Train & Test \\
+\midrule
+Number of Classes & 115 & 115 \\
+Mean images/class & 78.3 & 20.4 \\
+Total images & 9,001 & 2,348 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Label Engineering}
+Given the high inter-class visual similarity among diseases, we evaluated two label consolidation strategies (Figures~\ref{fig:19_classes} and \ref{fig:11_classes}):  
+\begin{enumerate}
+    \item \textbf{Visual Grouping:} We mapped the 115 fine-grained classes to 19 super-classes based on shared visual nomenclature (e.g., grouping rust types under `Rust').  
+    \item \textbf{Treatment-Based Grouping:} We mapped the 115 classes to 11 actionable super-classes defined by pathogen type and management strategy (e.g., FungalRust, ViralDisease). A plant pathology expert reviewed this consolidation to ensure that merged categories correspond to consistent treatment protocols.
+\end{enumerate}
+All experiments used the same images; only the target labels differed by grouping strategy.  
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{19_classes.pdf}
+    \caption{19-class Visual-Based Grouping strategy.}
+    \label{fig:19_classes}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{11_classes.pdf}
+    \caption{11-class Treatment-Based Grouping strategy.}
+    \label{fig:11_classes}
+\end{figure}
+
+\subsection{Two-Stage Pipeline}
+The pipeline has three sequential stages—feature extraction, dimensionality reduction, and machine learning classification—designed to transform raw images into predictions (Figure~\ref{fig:system_architecture}). Decoupling feature extraction from classification supports lightweight retraining without re-optimizing the deep backbone, which is advantageous for scenarios requiring rapid model adaptation and minimal computational cost.
+
+\textbf{Feature extraction.} We compared three state-of-the-art backbones used as frozen feature extractors:
+\begin{itemize}
+    \item \textbf{ResNet50}: A standard deep residual network widely used in image classification.
+    \item \textbf{EfficientNet-B0}: A lightweight architecture optimized for mobile applications.
+    \item \textbf{YOLOv8m}: A modern object detection architecture adapted for feature extraction. We extracted activation maps from the final C2f block (Layer 8), selected as a trade-off between semantic depth and spatial resolution.
+\end{itemize}
+All backbones were pretrained on ImageNet (or COCO in YOLO's case) and fine-tuned on the PlantWildV2 training split. Features were extracted once and stored as a static bank.
+
+\textbf{Reduced Order Modelling via PCA/SVD.} The high-dimensional feature maps extracted from deep backbones contain significant redundancy. We implemented Reduced Order Modelling (ROM) using two techniques: Incremental Principal Component Analysis (IPCA) for memory-efficient streaming, and Truncated Singular Value Decomposition (SVD). We compressed the feature space to a compact latent representation of $n=100$ dimensions, as identified by our ablation study. The transformers were fitted only on the training set to prevent data leakage.
+
+\textbf{Classification.} We trained a Support Vector Classifier (SVC) on the resulting low-dimensional representations. We used scikit-learn's implementation with a radial basis function (RBF) kernel and class weighting to address imbalance.
+
+\subsection{Experimental Design}
+
+We conducted three sequential experiments to identify the optimal pipeline configuration.
+
+\textbf{Experiment 1: Optimal \textit{n\_components} Ablation.}
+We aimed to identify the optimal number of principal components. We expected an intermediate dimensionality to retain signal while discarding noise. We trained SVC models with component counts ranging from 100 to 5{,}745 and identified $n=100$ as the optimal trade-off point where overfitting was minimized.
+
+\textbf{Experiment 2: Backbone and Compression Comparison.}
+Using the optimal dimensionality (\textbf{n=100}), we conducted a comprehensive comparison of three backbones (YOLOv8m, ResNet50, EfficientNet-B0) combined with two compression methods (IPCA, SVD). This resulted in six model configurations, evaluated on both the 19-class (Visual) and 11-class (Treatment-based) tasks. This experiment directly addresses the need for comparative validation against standard architectures.
+
+\textbf{Experimental 3: Final Model Validation.}
+We selected the best-performing configuration (YOLOv8m + IPCA) for a final in-depth evaluation, including per-class analysis and confusion matrix inspection.
+
+
+\section{Results}
+\label{sec:results}
+We report results in three parts: (1) an ablation confirming feature dimensionality, (2) a comparative analysis of backbones demonstrating the superiority of the YOLO-based approach, and (3) a detailed evaluation of the champion model.
+
+\subsection{Optimal Feature Dimensionality: Less is More}
+Our initial ablation confirmed that performance peaks at \textbf{100 principal components} and degrades with higher dimensionality. This counter-intuitive result indicates that aggressive compression acts as a powerful regularizer, filtering out task-irrelevant background noise often present in high-dimensional feature maps. All subsequent results use $n=100$.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{n_components_ablation_plot.png}
+  \caption{F1-Macro as a function of the number of principal components. Performance peaks at n=100 and then degrades, indicating that strong dimensionality reduction regularizes the task.}
+  \label{fig:ablation_plot}
+\end{figure}
+
+\subsection{Backbone and Method Comparison}
+Table~\ref{tab:master_results_summary} presents the performance of all tested configurations. The YOLOv8m backbone significantly outperformed ResNet50 and EfficientNet-B0 across all tasks. Specifically, the proposed \textbf{YOLOv8m + IPCA} pipeline achieved a test accuracy of \textbf{87.52\%}, surpassing the EfficientNet-B0 + IPCA pipeline (70.53\%) by over 16 percentage points.
+
+Interestingly, Incremental PCA (IPCA) yielded slightly better or comparable results to Truncated SVD, while offering the practical advantage of stream-processing large datasets without loading the entire feature bank into memory. The treatment-based (11-class) and visual-based (19-class) groupings showed identical high performance with the YOLO backbone, suggesting its features are robust enough to capture the underlying pathology regardless of the specific label hierarchy.
+
+\begin{table}
+\centering
+\caption{Test performance of different backbones and compression methods (n=100). The YOLOv8m + IPCA pipeline achieves the highest accuracy, significantly outperforming standard architectures.}
+\label{tab:master_results_summary}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllcccc}
+\toprule
+\textbf{Labeling Strategy} & \textbf{Backbone} & \textbf{Compression} & \textbf{ML Model} & \textbf{Accuracy (\%)} & \textbf{F1-Macro} & \textbf{Training Time (s)} \\
+\midrule
+\multirow{6}{*}{Visual Grouping (19 Classes)} 
+ & EfficientNet-B0 & IPCA & SVC & 68.23 & 0.705 & 33.5 \\
+ & EfficientNet-B0 & SVD & SVC & 65.93 & 0.684 & 31.0 \\
+ & ResNet50 & IPCA & SVC & 66.23 & 0.681 & 34.5 \\
+ & ResNet50 & SVD & SVC & 59.63 & 0.618 & 32.8 \\
+ & \textbf{YOLOv8m (Champion)} & \textbf{IPCA} & \textbf{SVC} & \textbf{86.54} & \textbf{0.863} & \textbf{29.7} \\
+ & YOLOv8m & SVD & SVC & 86.03 & 0.854 & 26.4 \\
+\midrule
+\multirow{6}{*}{Treatment Grouping (11 Classes)} 
+ & EfficientNet-B0 & IPCA & SVC & 70.53 & 0.706 & 37.8 \\
+ & EfficientNet-B0 & SVD & SVC & 67.97 & 0.685 & 36.8 \\
+ & ResNet50 & IPCA & SVC & 68.27 & 0.679 & 40.4 \\
+ & ResNet50 & SVD & SVC & 61.07 & 0.619 & 39.9 \\
+ & \textbf{YOLOv8m (Champion)} & \textbf{IPCA} & \textbf{SVC} & \textbf{87.52} & \textbf{0.882} & \textbf{30.8} \\
+ & YOLOv8m & SVD & SVC & 86.54 & 0.874 & 28.1 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{In-Depth Analysis of the Champion Pipeline}
+We analyzed the champion model (YOLOv8 + IPCA(n=100) + SVC) on the 11-class treatment-based task.
+
+\subsubsection{Per-Class Performance}
+The model demonstrates exceptional robustness, particularly on visually distinct classes. Table~\ref{tab:per_class_report} shows F1-scores exceeding 0.90 for \texttt{fungal\_powdery\_mildew} and \texttt{abiotic\_disorder}. Even for challenging classes like \texttt{fungal\_rot\_fruit\_disease}, the model maintains respectable performance.
+
+\begin{table}
+\centering
+\caption{Per-class performance of the champion SVC model on the 11-class test set.}
+\label{tab:per_class_report}
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
+\midrule
+abiotic\_disorder & 0.85 & 1.00 & 0.92 & 23 \\
+bacterial\_disease & 0.83 & 0.80 & 0.81 & 320 \\
+fungal\_downy\_mildew & 0.81 & 0.90 & 0.85 & 150 \\
+fungal\_leaf\_disease & 0.90 & 0.85 & 0.87 & 835 \\
+fungal\_powdery\_mildew & 0.95 & 0.94 & 0.95 & 188 \\
+fungal\_rot\_fruit\_disease & 0.78 & 0.81 & 0.79 & 152 \\
+fungal\_rust & 0.89 & 0.89 & 0.89 & 320 \\
+fungal\_scab & 0.86 & 0.98 & 0.92 & 64 \\
+fungal\_systemic\_smut\_gall & 0.79 & 0.86 & 0.82 & 96 \\
+oomycete\_lesion & 0.80 & 0.90 & 0.85 & 15 \\
+viral\_disease & 0.81 & 0.88 & 0.84 & 185 \\
+\midrule
+\textbf{Macro Avg} & \textbf{0.84} & \textbf{0.89} & \textbf{0.86} & \textbf{2,348} \\
+\textbf{Weighted Avg} & \textbf{0.86} & \textbf{0.86} & \textbf{0.86} & \textbf{2,348} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Error Analysis and Model Calibration}
+The confusion matrix (Figure~\ref{fig:final_cm}) confirms low misclassification rates. The reliability diagram (Figure~\ref{fig:reliability_diagram}) indicates the model remains well-calibrated, a critical property for automated decision support systems in agriculture.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.75\textwidth]{champion_confusion_matrix.png} 
+  \caption{Normalized confusion matrix for the champion YOLO+IPCA model.}
+  \label{fig:final_cm}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.65\textwidth]{reliability_diagram_sklearn_SVC.png}
+\caption{Reliability diagram for the champion model.}
+\label{fig:reliability_diagram}
+\end{figure}
+
+\subsection{Comparison with High-Resource End-to-End Baselines}
+
+To contextualize the efficiency of our hybrid approach, we benchmarked it against a standard high-resource alternative: a fully fine-tuned EfficientNet-B0 trained end-to-end. Ideally, end-to-end fine-tuning offers the upper bound of performance as feature representations are optimized directly for the target task.
+
+However, as shown in Table~\ref{tab:benchmark}, our significantly lighter pipeline achieves a test accuracy of \textbf{87.52\%}, which surprisingly outperforms the end-to-end baseline (82.50\%). This result indicates that the strong inductive biases of the YOLOv8 detection backbone provide richer initial features for localized disease symptoms than a classification backbone trained from scratch, even with fine-tuning.
+
+Crucially, the computational advantage is decisive. While the baseline requires heavy GPU resources for backpropagation, our pipeline's classifier can be retrained in just \textbf{30.8 seconds} on a standard CPU. This represents a \textbf{~670$\times$ speedup} in adaptation time, making the system uniquely suitable for dynamic agricultural environments where new diseases may require frequent model updates.
+
+\begin{table}[h]
+\centering
+\caption{Comparison with High-Resource Baseline. The proposed ROM framework outperforms the computation-heavy end-to-end model while drastically reducing training time.}
+\label{tab:benchmark}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Model} & \textbf{Test Acc.} & \textbf{Training Time} & \textbf{Hardware} & \textbf{Retraining Cost} \\ \hline
+EfficientNet-B0 (End-to-End) & 82.50\% & $\sim$5.8 hours & GPU (A100) & High \\
+\textbf{Proposed Pipeline (YOLO+IPCA+SVC)} & \textbf{87.52\%} & \textbf{30.8 seconds} & \textbf{CPU} & \textbf{Negligible} \\ \hline
+\end{tabular}
+\end{table}
+
+
+\section{Discussion}
+\label{sec:discussion}
+
+The experiments provide guidance for building accurate and efficient classifiers on PlantWildV2 and clarify interactions among feature source, label design, and classifier choice.
+
+\subsection{YOLOv8 as a Feature Extractor for Phytopathology}
+We show that a YOLOv8m detection backbone, originally optimized for localization, can serve as a strong feature extractor for fine-grained disease classification. Our best pipeline (YOLOv8 features + IPCA + SVC) achieved a test accuracy of 87.52\%, surpassing a fine-tuned EfficientNet-B0 baseline (82.5\%) under the same data split and evaluation protocol. YOLOv8 produces spatially rich activation maps that remain discriminative after flattening and PCA compression, supporting the hypothesis that detection backbones are well suited to capturing localized lesion patterns.
+
+\subsection{The Impact of Label Engineering}
+The largest gains came from reformulating the label space. Moving from the 19-class Visual Grouping to the 11-class Treatment-Based Grouping improved accuracy and macro-F1 across all classifiers. This supports the view that high inter-class similarity is a key bottleneck \cite{wei2021fine}. Consolidating visually similar diseases into treatment-relevant super-classes simplified decision boundaries and aligned outputs with actionable recommendations, underscoring the value of domain-aware label design.
+
+\subsection{Model Generalization and Practical Deployment}
+Our analysis revealed that tree-based ensembles (RandomForest, XGBoost) nearly saturated the training set yet showed large generalization gaps \cite{sahin2020assessing}. In contrast, SVC delivered the highest test accuracy with a smaller gap, suggesting that the YOLOv8+PCA feature space aligns well with the maximum-margin principle. The two-stage pipeline thus provides two advantages: (1) high test accuracy with good generalization and (2) a decoupled architecture that enables rapid retraining and efficient inference, which is favorable for applications operating under strict memory and processing constraints.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We addressed in-the-wild plant disease classification on PlantWildV2 by proposing a two-stage pipeline that separates deep feature extraction from lightweight classification. Using a YOLOv8m backbone as a feature extractor yielded spatially sensitive representations well suited to localized symptoms.
+
+A central result is the role of label engineering. Consolidating 115 fine-grained classes into 11 treatment-based groups simplified the task and consistently improved accuracy and macro-F1 across models. This highlights domain-aware label design as a primary optimization strategy in applied agricultural AI.
+
+Our optimal pipeline—YOLOv8 features, PCA, and a tuned SVC—achieved a test accuracy of 87.52\% and a macro F1-score of 0.882. Although only slightly above a fine-tuned EfficientNet-B0 baseline (82.5\%), the pipeline offers practical benefits: fast retraining of the lightweight classifier and suitability for resource-constrained deployment, where efficiency and reliability are essential.
+
+Future work will extend this approach in two directions. First, we will evaluate alternative feature extractors, including Vision Transformers and lightweight YOLO variants, building on recent hybrid architectures \cite{rgHybridFrameworkCNNViT}, to further balance accuracy and efficiency. Second, we will explore hierarchical classification schemes to provide both treatment-level recommendations and fine-grained disease identification. These directions aim to advance accurate, robust, and field-ready diagnostic tools for sustainable agriculture.
+
+\bibliographystyle{elsarticle-harv}
+\bibliography{biblio}
+
+\end{document}

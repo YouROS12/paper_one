@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.ipynb_checkpoints
+*.npy
+*.joblib
+*.pkl
+*.DS_Store
+plantwild_temp/
+reviewers_suggestion_paper1/
+.vscode/
+.idea/

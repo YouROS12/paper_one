@@ -1,0 +1,83 @@
+Reviewer 1: Please list your revision requests for the authors and provide your detailed comments, including highlighting limitations and strengths of the study and evaluating the validity of the methods, results, and data interpretation. If you have additional comments based on Q2 and Q3 you can add them as well.
+ Reviewer 1 | 04 Jan 2026 | 08:57#1
+Section 3
+Figure 1 appears too small relative to the available page space. I recommend enlarging it to improve readability and visual clarity.
+
+Section 3.1
+The authors state that models trained on the PV dataset may be biased due to background cues, and therefore they adopt the PlantWildV2 dataset in this study. However, the manuscript does not clearly explain why PlantWildV2 would not suffer from the same background-bias issues. Please provide justification or empirical evidence supporting this assumption.
+
+Section 3.3 Feature Extraction
+The process for generating the static feature bank is unclear. For example, what occurs when two similar classes from different image?
+
+Section 4.1 Figure 5
+The manuscript does not explain what the black (100) and yellow (1) lines represent in Figure 5. Please clarify this in the figure caption and/or text.
+
+Overall comments
+
+-The core novelty of this paper is feature compression for plant disease identification. However, the experimental validation is limited. The proposed feature compression method is evaluated using only one model as the feature extractor. To demonstrate robustness and generality, the authors should also evaluate feature compression performance using multiple state-of-the-art (SOTA) backbone models.
+
+-Lack of comparison with other feature compression methods. The method should be compared against existing SOTA feature compression or dimensionality-reduction approaches to justify novelty and performance gains.
+
+-Experiments 4.1-4.3 lack meaningful comparison. These experiments rely on a single model and a single compression pipeline, so they do not provide sufficient comparative insight.
+
+-Unfair comparison in Experiment 4.4. Other deep-learning models are trained end-to-end, whereas the proposed method treats the model only as a feature extractor (as in YOLOv8). For a fair comparison, all models should be used in the same way (i.e., as feature extractors feeding into the proposed compression pipeline).
+
+- Label engineering justification is insufficient. The relabeling strategy requires stronger justification and supporting evidence to demonstrate that it improves label quality and does not introduce bias or ambiguity.
+Add comment
+Q 2Check List
+ Reviewer 1 | 04 Jan 2026 | 08:57#1
+a. Is the quality of the figures and tables satisfactory?
+- No
+
+b. Does the reference list cover the relevant literature adequately and in an unbiased manner?
+- No
+
+c. Are the statistical methods valid and correctly applied? (e.g. sample size, choice of test)
+- No
+
+d. Is a statistician required to evaluate this study?
+- No
+
+e. Are the methods sufficiently documented to allow replication studies?
+- No
+
+
+
+
+Reviwer 2 : " Reviewer 2 | 09 Jan 2026 | 07:34#1
+Please reduce the AI writing report to less than 20%. The AI writing report is 26%.
+Please follow the proper citation. Arrange it in chronological order.
+Please use references from reputable journals or conference proceedings, at least in the last 10 years.
+Introduction was well written, however, it does not follow the proper way of citation.
+In the Related Work section, the discussion is too short. Consider adding sections like Plant Disease Classification using Dl or other methods; Discussion about PCA and SVC, since you mention it in your manuscript.
+In 2.3, you can further elaborate on the advantages or novelty of your proposed study.
+You may also consider a section discussing label engineering, since this is part of your title.
+Have a discussion or explanation about your Algorithm, refer to page 4.
+Further elaborate your discussion about your dataset section 3.1. Also, please include citation.
+Also, elaborate your discussion for Figures 3-4.
+Include the evaluation metrics discussion.
+Consider providing a summary table for the performance of your proposed system versus other or existing models.
+Consider adding more references, at least 50 references.
+
+
+
+
+
+Add comment
+Q 2Check List
+ Reviewer 2 | 09 Jan 2026 | 07:34#1
+a. Is the quality of the figures and tables satisfactory?
+- No
+
+b. Does the reference list cover the relevant literature adequately and in an unbiased manner?
+- No
+
+c. Are the statistical methods valid and correctly applied? (e.g. sample size, choice of test)
+- Not Applicable
+
+d. Is a statistician required to evaluate this study?
+- No
+
+e. Are the methods sufficiently documented to allow replication studies?
+- No
+"

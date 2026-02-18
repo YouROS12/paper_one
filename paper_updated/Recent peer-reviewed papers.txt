@@ -1,0 +1,378 @@
+Task: Find recent peer-reviewed papers (2022–2026) about plant disease detection in real agricultural field conditions using artificial intelligence and computer vision.
+
+I am specifically interested in research that addresses the limitations of deep learning models trained on laboratory datasets (e.g., PlantVillage) when deployed in the wild.
+
+Prioritize papers that include one or more of the following:
+
+field imagery datasets (in-the-wild agriculture, real farms, smallholder conditions)
+
+domain shift / covariate shift / generalization gap
+
+class imbalance handling in agricultural datasets
+
+early disease symptom detection (low contrast lesions)
+
+object detection approaches (YOLO, YOLOv5/YOLOv7/YOLOv8, DETR, localization-based recognition)
+
+hybrid pipelines (CNN feature extraction + SVM/Random Forest/ML classifier)
+
+transfer learning from detection backbones
+
+dimensionality reduction (PCA, SVD, feature compression)
+
+lightweight or edge AI deployment (mobile, embedded, drone, IoT)
+
+computational efficiency and model compression (pruning, quantization, distillation)
+
+De-prioritize:
+
+pure PlantVillage classification papers
+
+basic CNN classifiers without real-world validation
+
+For each paper provide:
+
+title
+
+year
+
+dataset used
+
+whether it used field images
+
+method (classification, detection, hybrid, or edge AI)
+
+main contribution
+
+link to PDF if available
+
+## Scope and selection criteria
+Recent (2022–2026) peer‑reviewed papers were prioritized if they (i) use field/in‑the‑wild imagery or validate on such datasets, and/or (ii) explicitly study lab→field generalization limits (domain/covariate shift) typical of models trained on controlled datasets such as PlantVillage. Papers below also cover one or more of: class imbalance, early/subtle symptoms, object detection/localization, hybrid pipelines, transfer learning, dimensionality reduction/downsampling, and edge/efficiency.
+
+---
+
+## Curated recent papers (2022–2026)
+
+### 1) From Laboratory to Field: Unsupervised Domain Adaptation for Plant Disease Recognition in the Wild
+- **Year:** 2023
+- **Method:** **Classification + domain adaptation** (unsupervised domain adaptation)
+- **Datasets used:** PlantDoc; Plant‑Pathology; Corn‑Leaf‑Diseases; Tomato‑Leaf‑Diseases (evaluated as target domains; PlantVillage is described as the canonical lab/“source” domain in the paper’s framing). ([1.1])
+- **Field images used?** **Yes** (PlantDoc is field/in‑the‑wild; paper targets lab→field shift). ([1.1])
+- **Main contribution:** Proposes **MSUN**, a **non‑adversarial unsupervised domain adaptation** method (multi‑representation + subdomain alignment + **uncertainty regularization**) to learn domain‑invariant representations and reduce lab→field performance drops. ([1.1])
+- **Notes on priorities:** Directly addresses **domain shift/generalization gap** between lab and field (complex backgrounds, blur, occlusion). ([1.1])
+- **PDF link:** https://doi.org/10.34133/plantphenomics.0038 ([1.1])
+
+### 2) Plant disease classification in the wild using vision transformers and mixture of experts
+- **Year:** 2025
+- **Method:** **Classification** (ViT backbone + Mixture‑of‑Experts)
+- **Datasets used:** **PlantVillage** (54,306 images; controlled) and **PlantDoc** (2,598 images; real‑field). Also curated balanced subsets **PV_100** and **PV_200**. ([2.1], [2.2])
+- **Field images used?** **Yes** (PlantDoc), plus explicit cross‑domain training/testing PV→PlantDoc. ([2.1], [2.3])
+- **Main contribution:** A **ViT + MoE** architecture with gating plus **entropy / orthogonal / usage regularization** to improve robustness under covariate shift, evaluated explicitly on lab→field transfer. ([2.4], [2.5])
+- **Domain shift evidence:** Quantifies PV vs PlantDoc shift via **KL divergence** on ResNet50 features; performs PV→PlantDoc cross‑domain evaluation (e.g., ~0.68 accuracy when trained on PV_200 and evaluated on PlantDoc). ([2.3], [2.2])
+- **Class imbalance handling:** Notes PlantVillage imbalance/redundancy and uses **t‑SNE clustering** on VGG16 features to construct more balanced representative subsets (PV_100/PV_200) with small performance loss. ([2.3])
+- **PDF link:** https://doi.org/10.3389/fpls.2025.1522985 ([2.5])
+
+### 3) Xoo‑YOLO: a detection method for wild rice bacterial blight in the field from the perspective of unmanned aerial vehicles
+- **Year:** 2023
+- **Method:** **Object detection** (YOLOv8‑derived)
+- **Datasets used:** UAV **field imagery** dataset for wild rice bacterial blight detection (dataset size/annotation specifics not present in the extracted excerpt). ([3.1])
+- **Field images used?** **Yes** (explicitly “in the field” from UAVs). ([3.1])
+- **Main contribution:** Modifies YOLOv8 with **LSKNet** (large selective kernel) in the backbone for large receptive fields; adds **GSConv** in the neck to **reduce computation/parameters**; and adds an oriented‑box head by outputting a **rotation angle θ** to handle elongated/rotated lesions in UAV views. ([3.1])
+- **PDF link:** https://doi.org/10.3389/fpls.2023.1256545 ([3.1])
+
+### 4) Lightweight scalable deep learning framework for real time detection of potato leaf diseases
+- **Year:** 2026
+- **Method:** **Object detection** (SSD‑family detector with multi‑scale features + attention)
+- **Datasets used:** A curated/custom **potato leaf disease dataset** (lesion‑level detection) and comparison/validation against **PlantVillage**. ([4.1])
+- **Field images used?** **Partially/unclear from excerpt**: the work is motivated by in‑the‑wild deployment and explicitly discusses distribution shift (cultivars, backgrounds, etc.), but the excerpt does not definitively state the custom dataset is fully field‑captured. ([4.1])
+- **Main contribution:** Proposes **EF‑SSD** (extended feature hierarchy + SE attention) achieving high lesion‑level detection performance while maintaining real‑time inference; explicitly highlights lab→field failure modes and the need for cross‑domain evaluation beyond PlantVillage. ([4.1])
+- **Class imbalance handling:** Explicitly recognizes imbalance as a bias source and discusses mitigation directions (rebalancing, class‑balanced sampling, loss reweighting/focal loss). ([4.1])
+- **Early/subtle symptoms:** Notes **tiny/low‑contrast lesions** as hardest cases and suggests higher‑resolution/tiled inference and anchor/stride refinements; proposes multimodal RGB+thermal as future improvement for subtle symptoms. ([4.1])
+- **Efficiency/compression:** Described as lightweight/edge‑suitable; roadmap includes pruning, distillation, and INT8 quantization. ([4.1])
+- **PDF link:** https://doi.org/10.1038/s41598-025-33423-7 ([4.1])
+
+### 5) AI and IoT‑powered edge device optimized for crop pest and disease detection
+- **Year:** 2025
+- **Method:** **Edge AI classification** (lightweight CNN + **knowledge distillation**)
+- **Datasets used:** Two image datasets mixing **PlantVillage + field‑acquired images**: (i) crop‑pest dataset **12,400 images / 5 classes**; (ii) crop‑disease dataset **10,700 images / 4 classes**. ([5.1])
+- **Field images used?** **Yes** (explicitly includes field‑acquired images). ([5.1])
+- **Main contribution:** Designs **Tiny‑LiteNet** as a distilled lightweight model (student) from **MobileNetV2** (teacher), using SE depthwise blocks; deploys on **Raspberry Pi 5** with an IoT stack (camera + sensors + GSM/GPRS + solar power) for real‑time, power‑efficient in‑field inference. ([5.1])
+- **Efficiency/compression:** Distillation + lightweight architecture; explicit edge deployment. ([5.1])
+- **PDF link:** https://doi.org/10.1038/s41598-025-06452-5 ([5.1])
+
+### 6) Leveraging zero‑shot detection mechanisms to accelerate image annotation for machine learning in wild blueberry (Vaccinium angustifolium Ait.)
+- **Year:** 2024
+- **Method:** **Localization/object detection** (zero‑shot detection used to accelerate dataset creation)
+- **Datasets used:** In‑field wild blueberry imagery subsets including **red leaf disease** (66 field images captured June 2022; plus other field/aerial subsets for berries, buds, fescue). ([6.1])
+- **Field images used?** **Yes**. ([6.1])
+- **Main contribution:** Compares **Grounding DINO vs YOLO‑World** zero‑shot detectors to reduce manual annotation burden for field datasets; reports strong performance on red leaf disease (e.g., Grounding DINO high IoU/precision/F1) and discusses prompt/threshold tuning. ([6.2])
+- **PDF link:** https://doi.org/10.3390/agronomy14122830 ([6.1])
+
+### 7) Enhanced image annotation in wild blueberry fields using sequential zero‑shot detection and segmentation models
+- **Year:** 2025
+- **Method:** **Detection + segmentation pipeline** (zero‑shot detection + SAM2 instance segmentation)
+- **Datasets used:** Wild blueberry imagery from lab setups, **ground field photography**, and **aerial drone surveys**, across four classes including **red leaf disease**. ([7.1])
+- **Field images used?** **Yes** (explicit field and drone imagery). ([7.1])
+- **Main contribution:** A sequential automated annotation pipeline combining **Grounding DINO / YOLO‑World** with **SAM2**; includes accuracy vs. efficiency analysis and demonstrates strong red leaf disease segmentation (e.g., mIoU up to ~0.905 with Swin‑T + SAM2‑Large). ([7.2], [7.3])
+- **Efficiency/edge notes:** Highlights speed/accuracy tradeoffs; smaller SAM2 variants (Tiny/Small/Base) and Swin‑T are fastest and suggested for resource‑constrained settings. ([7.4])
+- **PDF link:** https://doi.org/10.3390/s25237325 ([7.2])
+
+---
+
+## Supplemental (useful for framing lab→field limitations; not a primary “method” paper)
+
+### Assessing the performance of domain-specific models for plant leaf disease classification: a comprehensive benchmark of transfer-learning on open datasets
+- **Year:** 2025
+- **Method:** **Benchmarking study** (classification transfer learning across many datasets)
+- **Datasets used:** Benchmarks 23 models across 18 datasets; explicitly discusses dataset taxonomy (lab vs field vs hybrid) and highlights PlantVillage’s limitations for field robustness. ([8.1], [8.2])
+- **Field images used?** **Indirectly** (benchmarks include field/hybrid datasets; emphasizes lab→field generalization limitations). ([8.2])
+- **Main contribution:** Provides a broad, systematic baseline across models/datasets to guide dataset and architecture choice, emphasizing the need to benchmark beyond lab datasets. ([8.1], [8.2])
+- **PDF link:** https://doi.org/10.1038/s41598-025-03235-w ([8.1])
+
+---
+
+## Key cross-paper themes aligned to your priorities (evidence-backed)
+- **Explicit lab→field generalization testing:** PlantVillage→PlantDoc transfer with measured performance drops and covariate shift quantification (KL divergence) is directly evaluated in Salman et al. 2025. ([2.3], [2.2])
+- **Algorithmic domain adaptation:** Wu et al. 2023 introduces unsupervised domain adaptation (UDA) with uncertainty regularization to address lab→field shift using unlabeled target data. ([1.1])
+- **Object detection/localization in real field settings:** UAV/field detection with rotation-aware YOLO head and compute-reduction modules is demonstrated in Pan et al. 2023. ([3.1])
+- **Class imbalance and subtle symptoms:** Bhavani & Chalapathi 2026 explicitly flags imbalance as a bias and tiny/low‑contrast lesions as the hardest cases, suggesting focal loss/reweighting and higher-resolution/tiled inference. ([4.1])
+- **Edge AI and deployment realism:** Nyakuri et al. 2025 uses PlantVillage plus field images and deploys a distilled lightweight CNN on Raspberry Pi 5 with an IoT stack for real-time inference. ([5.1])
+
+References:
+[1.1] From Laboratory to Field: Unsupervised Domain Adaptation for Plant Disease Recognition in the Wild. Xinlu Wu, Xijian Fan, Peng Luo, Sruti Das Choudhury, Tardi Tjahjadi, Chunhua Hu. Plant Phenomics (2023). https://doi.org/10.34133/plantphenomics.0038
+    Context: "This excerpt describes Wu et al. (2023) which proposes MSUN (Multi-Representation Subdomain Adaptation Network with Uncertainty Regularization), an unsupervised domain adaptation method for cross-species plant disease classification. MSUN uses multirepresentation, subdomain adaptation modules, and auxiliary uncertainty regularization, trains nonadversarially on a large amount of unlabeled data, and is designed to learn invariant representations to mitigate domain shift between laboratory (clean, single-leaf, high-resolution) and field/in-the-wild (complex background, multiple leaves, blur, occlusion) images. The multirepresentation module captures overall structure and finer details from source representations; subdomain adaptation targets discriminative properties to handle higher interclass similarity and lower intraclass variation; uncertainty regularization suppresses transfer-induced uncertainty. MSUN was evaluated on PlantDoc, Plant-Pathology, Corn-Leaf-Diseases, and Tomato-Leaf-Diseases datasets, reporting accuracies of 56.06%, 72.31%, 96.78%, and 50.58%, respectively, outperforming other UDA techniques. The excerpt emphasizes domain shift and generalization challenges and the difficulty of collecting high-quality annotated field data. The excerpt does not provide details on class imbalance handling, early-symptom/low-contrast detection, or efficiency/edge-deployment."
+[2.1] Plant disease classification in the wild using vision transformers and mixture of experts. Zafar Salman, Abdullah Muhammad, Dongil Han. Frontiers in Plant Science (2025). https://doi.org/10.3389/fpls.2025.1522985
+    Context: "Salman et al. (2025) evaluate a Vision Transformer (ViT) feature extractor combined with a Mixture of Experts (MoE) decision architecture to improve plant disease classification, and they add novel regularization to promote robustness and balanced expert usage. They use two public datasets: PlantVillage (54,306 images, lab/controlled) and PlantDoc (2,598 images, captured under real-field conditions). The paper explicitly targets the lab-to-field generalization gap, noting prior work that achieved 99.35% on PlantVillage but below 40% on in-the-wild images, and frames their approach as bridging that cross-domain performance gap. The authors discuss common covariate-shift factors (lighting, backgrounds, object size and distance, disease severity/stage) and dataset issues that hurt generalization: class imbalance (tomato samples ~43.4%) and annotation errors in PlantDoc. MoE benefits are described (experts for separate tasks/data segments, gating that activates experts per input, enabling specialization and efficiency). Experimental results are said to show significant accuracy improvements, though exact numeric results on cross-domain evaluations are not provided in the excerpt."
+[2.2] Plant disease classification in the wild using vision transformers and mixture of experts. Zafar Salman, Abdullah Muhammad, Dongil Han. Frontiers in Plant Science (2025). https://doi.org/10.3389/fpls.2025.1522985
+    Context: "The paper uses controlled lab-style datasets (PlantVillage and PV_200/PV_100 subsets) and an in-the-wild field dataset (PlantDoc) for cross-domain evaluation. PV_100 is explicitly described as containing only 100 images per class. Authors train ViT-based models with a Mixture-of-Experts (ViT-MoE) architecture and compare against ViT-Base, InceptionV3, EfficientNet, API-Net, TransFG, CAL and ensemble baselines. Key regularizations applied are entropy, orthogonal, and usage regularization. MoE is used to let experts specialize on features (shapes, colors, textures); experiments varied top-K expert selection (top-K between 2 and 10 with 10 total experts). Results show near-perfect performance on controlled PlantVillage but a notable drop when tested in the wild: e.g., our model achieves 0.68 accuracy when trained on PV_200 and evaluated on PlantDoc, and 0.49 accuracy when trained on PV_100 and evaluated on PlantDoc. The authors explicitly state ViT-MoE plus the listed regularizations improves generalization across domains and highlight robustness in data-constrained settings; they also discuss the trade-off in number/depth of experts and the need for ablation/trial-and-error."
+[2.3] Plant disease classification in the wild using vision transformers and mixture of experts. Zafar Salman, Abdullah Muhammad, Dongil Han. Frontiers in Plant Science (2025). https://doi.org/10.3389/fpls.2025.1522985
+    Context: "The excerpt documents use of two primary datasets: PlantVillage (lab/curated) and PlantDoc (more variable, real-world/field-like). The authors note class imbalance and image redundancy in PlantVillage and quantify domain shifts with KL divergence computed on ResNet50 features (overall KL 0.1883; extreme per-class shifts such as Tomato Spider Mites = 1.3214). Pixel-level analysis shows PlantDoc has higher green/blue means and greater channel standard deviation, indicating varied lighting and field conditions. They perform explicit cross-domain evaluation by training on PlantVillage and testing on PlantDoc to assess generalization. To address imbalance/redundancy they apply T-SNE clustering on VGG16 features to produce downsampled balanced subsets (PlantVillage_100 and PlantVillage_200), selecting representative images per cluster and manually prioritizing clear disease examples; this reduced data size substantially with minor performance loss (VGG16 Model A on full data: accuracy/F1 = 0.9872; Model B on 200-image subset: 0.9660). The paper references a mixture-of-experts gating mechanism (emphasizing relevant experts), implying a ViT+Mixture-of-Experts approach in the study, though detailed ViT/MoE regularization specifics are not present in this excerpt. Overall, the excerpt highlights covariate shift quantification, class-imbalance mitigation and efficiency gains from downsampling with maintained generalization evaluation (lab-to-field)."
+[2.4] Plant disease classification in the wild using vision transformers and mixture of experts. Zafar Salman, Abdullah Muhammad, Dongil Han. Frontiers in Plant Science (2025). https://doi.org/10.3389/fpls.2025.1522985
+    Context: "The excerpt documents a Mixture-of-Experts (MoE) approach combined with vision transformers (paper title: "Plant disease classification in the wild using vision transformers and mixture of experts"). The training uses multiple losses: a Cross-Entropy classification loss (Lclass), a gating Cross-Entropy loss, plus regularizers — Entropy Regularization (Lentropy, Grandvalet & Bengio 2004) applied to the gating to prevent overconfidence and encourage balanced expert contributions; orthogonal regularization (Bansal et al., 2018) to encourage distinct, non-overlapping expert feature maps (minimizing similarity via Frobenius norms of weight products); and usage regularization (Steiner et al., 2021) to penalize under-utilization of experts. The total loss combines these terms: Ltotal = Lclass + Lgating + lentropyLentropy + lorthogonalLorthogonal + lusageLusage. Aggregation is via a gating-weighted sum of expert outputs to produce the final prediction (pfinal). Datasets explicitly mentioned are PlantVillage and PlantDoc — Table 1 reports class-wise and overall KL divergence for these datasets using a ResNet50 pretrained model, indicating the authors measured distributional differences (a proxy for domain/covariate shift) between lab (PlantVillage) and field-like (PlantDoc/in-the-wild) data. The excerpt does not provide numeric classification results, explicit cross-domain accuracy numbers, or detailed discussion of class imbalance or computational efficiency."
+[2.5] Plant disease classification in the wild using vision transformers and mixture of experts. Zafar Salman, Abdullah Muhammad, Dongil Han. Frontiers in Plant Science (2025). https://doi.org/10.3389/fpls.2025.1522985
+    Context: "The excerpt reports a ViT-based architecture combined with a Mixture of Experts (MoE) and a gating mechanism to improve plant disease classification in-the-wild. The MoE uses multiple expert networks ("multiple lightweight Multilayer Perceptron (MLP) Layers") and a gating network; experts are "computationally efficient and scalable." The model adds entropy regularization and orthogonal regularization to improve robustness and generalization. The paper explicitly frames the problem as a lab-to-field/covariate-shift issue: models trained on "high-quality images" suffer "a significant drop in their accuracies when tested in real-world agricultural settings," and "In the wild, models encounter images that are significantly different..." The excerpt cites cross-domain evaluation results: a reported "20% improvement in accuracy compared to Vision Transformer (ViT)" and "68% accuracy on cross-domain datasets like PlantVillage to PlantDoc," outperforming InceptionV3 and EfficientNet. Datasets named include PlantVillage and PlantDoc (used in cross-domain testing). The text discusses generalization gaps due to "variations in leaf morphology, object size, and disease manifestations" and environmental factors (lighting, backgrounds). There is no explicit mention of class imbalance handling in the provided pages, though computational efficiency of MoE is noted."
+[3.1] Xoo-YOLO: a detection method for wild rice bacterial blight in the field from the perspective of unmanned aerial vehicles. Pan Pan, Wenlong Guo, Xiaoming Zheng, Lin Hu, Guomin Zhou, Jianhua Zhang. Frontiers in Plant Science (2023). https://doi.org/10.3389/fpls.2023.1256545
+    Context: "Pan et al. (2023) propose Xoo-YOLO, a modified YOLOv8 tailored for detecting bacterial blight (Xoo) in wild rice using UAV field imagery. The model integrates LSKNet into the backbone to dynamically adjust large spatial receptive fields, and adds GSConv hybrid convolution in the neck to "reduce both the amount of calculation and parameters." To handle elongated and rotated lesion appearances from aerial views, they "incorporated a rotational angle (theta dimension) into the head layer's output." Reported performance is strong (mAP 94.95%) and the authors emphasize a "harmonious balance between accuracy and speed in disease detection," indicating efficiency gains relevant to UAV/edge deployment. The paper explicitly targets detection in field conditions "from the perspective of UAVs." The excerpt does not provide dataset size, annotation details, class balance statistics, explicit experiments on domain shift/generalization (beyond UAV viewpoint/rotation handling), nor specific results on early/low-contrast symptom detection. Overall, contributions cover architectural changes for receptive field and rotation-aware detection, computational reduction for efficiency, and strong field-oriented performance, but leave open details about dataset composition, class imbalance handling, and cross-domain generalization tests."
+[4.1] Lightweight scalable deep learning framework for real time detection of potato leaf diseases. Girigula Durga Bhavani, Mukkoti Maruthi Venkata Chalapathi. Scientific Reports (2026). https://doi.org/10.1038/s41598-025-33423-7
+    Context: "This excerpt describes EF-SSD (Extended Feature SSD), an object-detection framework for potato leaf disease detection evaluated on a curated potato-leaf (custom) dataset and additionally compared against the PlantVillage benchmark. EF-SSD is an SSD-based detector extended with a 10-layer multi-scale feature hierarchy, SE attention modules, and 512×512 input resolution; ablations attribute gains to the extended pyramid and SE blocks. Reported metrics: mAP@0.5 = 97%, mAP@0.5:0.95 = 71%, F1 = 95%, IoU = 89%, all while maintaining real-time inference. The paper explicitly addresses lab-to-field generalization: it validates on PlantVillage and acknowledges distribution-shift failure modes (different cultivars, stages, cameras, backgrounds) and plans cross-domain evaluation and dataset expansion. Class imbalance is recognized as a training bias source; mitigation proposals include dataset rebalancing, class-balanced sampling, loss reweighting or focal loss, and positive-sample rebalancing. Early/low-contrast lesions and tiny lesions are noted as hardest cases; proposed fixes include targeted augmentations, tiled inference or higher-resolution crops, stride/anchor refinements, and a multimodal RGB+thermal pipeline. For edge efficiency, EF-SSD is described as lightweight and edge-suitable, but the authors plan compression via structured pruning, knowledge distillation, INT8 quantization, mixed precision, and benchmarking on representative edge hardware."
+[5.1] AI and IoT-powered edge device optimized for crop pest and disease detection. Jean Pierre Nyakuri, Celestin Nkundineza, Omar Gatera, Kizito Nkurikiyeyezu, Gervais Mwitende. Scientific Reports (2025). https://doi.org/10.1038/s41598-025-06452-5
+    Context: "Nyakuri et al. (2025) use two datasets (PlantVillage plus field-acquired images) for pest and disease detection: the crop-pest set has 12,400 images across 5 classes and the crop-disease set has 10,700 images across 4 classes. Images were preprocessed to 224×224, with augmentation including width/height shifts up to 0–30%, shear/zoom up to 30%, brightness [0.8,1.2], random horizontal flips, nearest fill, and a 70/15/15 train/val/test split. Method: a Tiny-LiteNet lightweight CNN (student) distilled from a pretrained MobileNetV2 teacher; the student uses six squeeze-and-excitation (SE) depthwise blocks plus a fully connected classification head. The model trades ~1% lower accuracy for substantially reduced computational cost and is deployed on Raspberry Pi 5 for edge inference. System-level components include camera + weather sensors, GSM/GPRS for cloud connectivity, and a solar-powered battery. The paper highlights real-time, power-efficient, interpretable decision support and provides pseudocode (Algorithm 1) for on-device image capture → classification → text explanation. The excerpt does not describe explicit domain-adaptation algorithms, class-imbalance handling strategies, or dedicated methods for early-symptom/low-contrast detection beyond dataset inclusion of field images and augmentation."
+[6.1] Leveraging Zero-Shot Detection Mechanisms to Accelerate Image Annotation for Machine Learning in Wild Blueberry (Vaccinium angustifolium Ait.). Connor C. Mullins, Travis J. Esau, Qamar U. Zaman, Chloe L. Toombs, Patrick J. Hennessy. Agronomy (2024). https://doi.org/10.3390/agronomy14122830
+    Context: "The provided excerpt (Mullins et al., 2024) documents datasets and methods for evaluating zero-shot detection to speed image annotation for wild blueberry tasks, including a disease component (red leaf disease). For red leaf disease, 66 in-field images were captured with a Fujifilm FinePix HS30EXR in Kemptown, NS (June 2022, overcast). The study used additional in-field and aerial imagery (ripe berries, hair fescue clusters at 76 m) and some staged bud photos on blank backgrounds. Each dataset was annotated with bounding boxes and assessed using zero-shot detectors Grounding DINO and YOLO-World. Text prompts/labels were generated via ChatGPT (GPT-3.5 and GPT-4o) because zero-shot requires textual class descriptions. The study emphasizes that neither model requires training (enabling use with small datasets) and aims to identify the optimal zero-shot model to reduce labor/time for annotation. Efficiency/edge-relevant notes: YOLO-World reported 35.4 AP at 52.0 FPS on an NVIDIA V100 and is described as suitable for real-time detection and instance segmentation, suggesting potential for fast inference though explicit edge-device deployment details are not given. The 2025 Mullins et al. paper is not present in this excerpt."
+[6.2] Leveraging Zero-Shot Detection Mechanisms to Accelerate Image Annotation for Machine Learning in Wild Blueberry (Vaccinium angustifolium Ait.). Connor C. Mullins, Travis J. Esau, Qamar U. Zaman, Chloe L. Toombs, Patrick J. Hennessy. Agronomy (2024). https://doi.org/10.3390/agronomy14122830
+    Context: "The excerpt (Mullins et al. 2024) evaluates zero-shot detection on wild blueberry cropping system datasets (categories listed in Table 2 include ripe wild blueberries, wild blueberry buds, red leaf disease, and hair fescue). Methods: two zero-shot detectors (Grounding DINO and YOLO-World) were compared, with model prompts and optimal confidence thresholds selected per task (examples: YOLO-World prompt “a small blue sphere”, Grounding DINO “smooth blueberry”; thresholds reported per task). Grounding DINO outperformed YOLO-World overall and specifically on the red leaf disease subset, showing very high IoU, precision, and F1 (IoU 0.921 ± 0.135; precision 0.923 ± 0.134; F1 0.954 ± 0.083). The authors attribute strong disease detection to distinct red/brown discoloration against green backgrounds. The models were also tested on dense/small-object detection (F2 buds at 91%); Grounding DINO achieved higher precision and recall, reducing false positives. Annotation time per image was recorded and compared after manual adjustments, and the paper notes threshold trade-offs (adjusting confidence can change recall/precision but may lower IoU/F1). The excerpt contains no information about the 2025 Mullins et al. paper."
+[7.1] Enhanced Image Annotation in Wild Blueberry (Vaccinium angustifolium Ait.) Fields Using Sequential Zero-Shot Detection and Segmentation Models. Connor C. Mullins, Travis J. Esau, Riley Johnstone, Chloe L. Toombs, Patrick J. Hennessy. Sensors (2025). https://doi.org/10.3390/s25237325
+    Context: "Mullins et al. (2025) used a dataset with four classes: developmental F2-stage buds, ripe wild blueberries, red leaf disease, and hair fescue. Images were acquired in controlled lab setups, ground-based field photography, and aerial drone surveys (drone flight altitude 76 m, spatial resolution 8.63 mm). Ground truth included bounding boxes and polygon masks created with Roboflow. Methodologically, the paper introduces a sequential zero-shot pipeline combining zero-shot detectors (Grounding DINO and YOLO-World) with SAM2 segmentation (variants: Tiny, Small, Base, Large). The work emphasizes prompt tuning and confidence-threshold optimization and evaluates interactions between detectors and SAM2 variants (including Swin-T vs Swin-B trade-offs and four YOLO-World sizes). Main contributions include a novel, replicable automated instance-segmentation pipeline for complex field environments, the first sequential application of zero-shot detection plus SAM2 segmentation across multiple agricultural targets (including red leaf disease), and an analysis of accuracy vs. efficiency. Efficiency/edge considerations are explicit: smaller SAM2 (Tiny/Small) and Swin-T are highlighted for faster processing and lower resource use, suitable for real-time or edge applications."
+[7.2] Enhanced Image Annotation in Wild Blueberry (Vaccinium angustifolium Ait.) Fields Using Sequential Zero-Shot Detection and Segmentation Models. Connor C. Mullins, Travis J. Esau, Riley Johnstone, Chloe L. Toombs, Patrick J. Hennessy. Sensors (2025). https://doi.org/10.3390/s25237325
+    Context: "The 2025 Mullins et al. paper presents an automated annotation pipeline for wild blueberry fields that sequences zero-shot detection models (Grounding DINO and YOLO-World) with the Segment Anything Model v2 (SAM2). The authors tested the pipeline on field-relevant classes: ripe berries, developmental buds, hair fescue (weed), and red leaf disease (Exobasidium vaccinii). Grounding DINO outperformed YOLO-World; notably, Swin-T + SAM2-Large achieved mIoU 0.905 ± 0.114 for red leaf disease, indicating strong disease-detection performance. There are clear efficiency/edge tradeoffs: small SAM2 variants (Tiny/Small/Base) paired with Swin-T or Swin-B yielded the shortest processing times (≈0.30–0.38 s), while SAM2-Large gave higher segmentation accuracy but substantially longer runtimes (significant at α = 0.05), reducing practicality for real-time/edge deployment. The paper frames the contribution as a scalable, rapid annotation approach for in-field agricultural imagery and highlights disease-specific detection (red leaf) and weed prevalence (hair fescue in ~75% of Nova Scotia fields). The excerpt does not provide dataset size or exact image capture protocols, but repeatedly references wild blueberry fields, implying in-field imagery was used."
+[7.3] Enhanced Image Annotation in Wild Blueberry (Vaccinium angustifolium Ait.) Fields Using Sequential Zero-Shot Detection and Segmentation Models. Connor C. Mullins, Travis J. Esau, Riley Johnstone, Chloe L. Toombs, Patrick J. Hennessy. Sensors (2025). https://doi.org/10.3390/s25237325
+    Context: "The paper uses in-field wild blueberry imagery covering multiple subsets: developmental wild blueberry buds, ripe wild blueberries, and red leaf disease images (image set lightness reported, e.g., L* = 60.26 ± 19.55 for disease images). Methods are sequential zero-shot detection paired with segmentation (SAM2) models: SAM2 variants (Tiny, Small, Base, Large) combined with zero-shot detection backbones/variants (YOLO-World-s/m/l/x and Swin-T / Swin-B). For the disease component (red leaf disease), segmentation performance varied considerably across detection backbones: SAM2-Large reached up to 0.905 mIoU (with Swin-T), SAM2-Tiny ranged 0.245–0.884, and SAM2-Small up to 0.885, indicating strong but variable performance depending on detector choice. Across experiments, Swin-T and Swin-B detection models consistently yielded the highest mIoU scores. The authors note that YOLO-World scaling provides marginal segmentation gains and recommend choosing YOLO-World sizes based on computational efficiency and resource availability. SAM2-Small (and Tiny) are highlighted for stability/consistency, implying suitability for resource-constrained or edge deployments and for reducing compute/processing time."
+[7.4] Enhanced Image Annotation in Wild Blueberry (Vaccinium angustifolium Ait.) Fields Using Sequential Zero-Shot Detection and Segmentation Models. Connor C. Mullins, Travis J. Esau, Riley Johnstone, Chloe L. Toombs, Patrick J. Hennessy. Sensors (2025). https://doi.org/10.3390/s25237325
+    Context: "The provided excerpt (Mullins et al., 2025) reports work on automated image annotation in commercially managed wild blueberry fields (Nova Scotia and New Brunswick), using in-field imagery to detect and segment targets including ripe blueberries, F2 developmental buds, hair fescue, and specifically red leaf disease. The method combines zero-shot detection models (Swin-T, Swin-B, Grounding DINO, YOLO-World) with SAM2 segmentation variants to form a sequential zero-shot detection + segmentation pipeline. Key results for the disease component: SAM2-Large paired with Swin-T achieved a high mIoU for red leaf disease (0.905 ± 0.114), indicating strong segmentation performance for that class. Efficiency/edge considerations are quantified: SAM2-Tiny/Small/Base with Swin models are fastest (~0.30–0.38 s per inference) and offer a balance of speed and accuracy for near-real-time or edge use, while SAM2-Large is more accurate but heavier (0.42–0.48 s) and less practical for constrained deployments. Authors note dataset geographic specificity may limit generalizability and recommend integrating zero-shot mechanisms into a fully automated pipeline and broader real-world testing. The excerpt does not contain information from the 2024 Mullins et al. paper."
+[8.1] Assessing the performance of domain-specific models for plant leaf disease classification: a comprehensive benchmark of transfer-learning on open datasets. David J. Richter, Kyungbaek Kim. Scientific Reports (2025). https://doi.org/10.1038/s41598-025-03235-w
+    Context: "Richter & Kim (2025) present a systematic benchmark of transfer-learning for plant leaf disease classification. They implement and train 23 models across 18 (mostly open) datasets, running 5 repetitions per experiment and comparing all 414 model–dataset combinations. The work focuses on image-based DL classification using modern CNN families (examples named: MobileNet, EfficientNet, ConvNeXt) and evaluates both transfer-learning and transfer-learning with fine-tuning. Common open datasets explicitly cited include PlantVillage, FGVC7 and FGVC8 Plant Pathology Datasets, and the cassava leaf dataset. The paper emphasizes dataset adequacy as a core challenge and notes that many prior works use proprietary datasets; PlantVillage is commonly used but has limitations. Their stated contributions include per-dataset evaluation to identify which datasets best support training and benchmarking, and producing a comparable baseline across many models and datasets to guide future researchers. The provided excerpt does not report explicit treatments or experiments targeting class imbalance, explicit lab-to-field/domain-shift analyses (beyond per-dataset suitability), early/low-contrast symptom detection, object-detection frameworks, or edge-efficiency/compression techniques."
+[8.2] Assessing the performance of domain-specific models for plant leaf disease classification: a comprehensive benchmark of transfer-learning on open datasets. David J. Richter, Kyungbaek Kim. Scientific Reports (2025). https://doi.org/10.1038/s41598-025-03235-w
+    Context: "Richter & Kim (2025) outline transfer-learning and fine-tuning workflows: reusing pretrained feature extractors (commonly ImageNet-based), often freezing convolutional layers and replacing/training a classifier head, then optionally unfreezing layers for fine-tuning to adapt to new data. They emphasize practical benefits: faster training, fewer epochs, and lower resource needs. The paper stresses that dataset quality limits model performance and catalogs common plant-leaf datasets (PlantVillage, FGVC7/8, cassava). It proposes a three-way taxonomy of datasets: lab (controlled), field (in-the-wild), and hybrid. Lab datasets (notably PlantVillage) are widely used but lead to models that lack robustness under real-world (field) conditions, complicating lab-to-field generalization and benchmarking. Field datasets are fewer and often proprietary, hindering cross-study comparison; hybrids can mitigate robustness issues but still lack large standardized benchmarks. Figures referenced show example images for lab, field, and hybrid datasets. Overall, the excerpt provides definitions and highlights dataset-induced domain-shift and benchmarking limitations relevant to lab-to-field generalization."
+
+
+
+@article{wu2023fromlaboratoryto,
+    author = "Wu, Xinlu and Fan, Xijian and Luo, Peng and Choudhury, Sruti Das and Tjahjadi, Tardi and Hu, Chunhua",
+    title = "From Laboratory to Field: Unsupervised Domain Adaptation for Plant Disease Recognition in the Wild",
+    year = "2023",
+    journal = "Plant Phenomics",
+    volume = "5",
+    month = "Mar",
+    doi = "10.34133/plantphenomics.0038",
+    url = "https://doi.org/10.34133/plantphenomics.0038",
+    pages = "0038",
+    publisher = "Elsevier BV",
+    issn = "2643-6515"
+}
+
+
+@article{salman2025plantdiseaseclassification,
+    author = "Salman, Zafar and Muhammad, Abdullah and Han, Dongil",
+    title = "Plant disease classification in the wild using vision transformers and mixture of experts",
+    year = "2025",
+    journal = "Frontiers in Plant Science",
+    volume = "16",
+    month = "Jun",
+    doi = "10.3389/fpls.2025.1522985",
+    url = "https://doi.org/10.3389/fpls.2025.1522985",
+    publisher = "Frontiers Media SA",
+    issn = "1664-462X"
+}
+
+
+@article{pan2023xooyoloadetection,
+    author = "Pan, Pan and Guo, Wenlong and Zheng, Xiaoming and Hu, Lin and Zhou, Guomin and Zhang, Jianhua",
+    title = "Xoo-YOLO: a detection method for wild rice bacterial blight in the field from the perspective of unmanned aerial vehicles",
+    year = "2023",
+    journal = "Frontiers in Plant Science",
+    volume = "14",
+    month = "Oct",
+    doi = "10.3389/fpls.2023.1256545",
+    url = "https://doi.org/10.3389/fpls.2023.1256545",
+    publisher = "Frontiers Media SA",
+    issn = "1664-462X"
+}
+
+
+@article{bhavani2026lightweightscalabledeep,
+    author = "Bhavani, Girigula Durga and Chalapathi, Mukkoti Maruthi Venkata",
+    title = "Lightweight scalable deep learning framework for real time detection of potato leaf diseases",
+    year = "2026",
+    journal = "Scientific Reports",
+    month = "Feb",
+    doi = "10.1038/s41598-025-33423-7",
+    url = "https://doi.org/10.1038/s41598-025-33423-7",
+    publisher = "Springer Science and Business Media LLC",
+    issn = "2045-2322"
+}
+
+
+@article{nyakuri2025aiandiotpowered,
+    author = "Nyakuri, Jean Pierre and Nkundineza, Celestin and Gatera, Omar and Nkurikiyeyezu, Kizito and Mwitende, Gervais",
+    title = "AI and IoT-powered edge device optimized for crop pest and disease detection",
+    year = "2025",
+    journal = "Scientific Reports",
+    volume = "15",
+    month = "Jul",
+    doi = "10.1038/s41598-025-06452-5",
+    url = "https://doi.org/10.1038/s41598-025-06452-5",
+    publisher = "Springer Science and Business Media LLC",
+    issue = "1",
+    issn = "2045-2322"
+}
+
+
+@article{mullins2024leveragingzeroshotdetection,
+    author = "Mullins, Connor C. and Esau, Travis J. and Zaman, Qamar U. and Toombs, Chloe L. and Hennessy, Patrick J.",
+    title = "Leveraging Zero-Shot Detection Mechanisms to Accelerate Image Annotation for Machine Learning in Wild Blueberry (Vaccinium angustifolium Ait.)",
+    year = "2024",
+    journal = "Agronomy",
+    volume = "14",
+    pages = "2830",
+    month = "Nov",
+    doi = "10.3390/agronomy14122830",
+    url = "https://doi.org/10.3390/agronomy14122830",
+    publisher = "MDPI AG",
+    issue = "12",
+    issn = "2073-4395"
+}
+
+
+@article{mullins2025enhancedimageannotation,
+    author = "Mullins, Connor C. and Esau, Travis J. and Johnstone, Riley and Toombs, Chloe L. and Hennessy, Patrick J.",
+    title = "Enhanced Image Annotation in Wild Blueberry (Vaccinium angustifolium Ait.) Fields Using Sequential Zero-Shot Detection and Segmentation Models",
+    volume = "25",
+    issn = "1424-8220",
+    url = "https://doi.org/10.3390/s25237325",
+    doi = "10.3390/s25237325",
+    number = "23",
+    journal = "Sensors",
+    publisher = "MDPI AG",
+    year = "2025",
+    month = "Dec",
+    pages = "7325",
+    issue = "23"
+}
+
+
+@article{richter2025assessingtheperformance,
+    author = "Richter, David J. and Kim, Kyungbaek",
+    title = "Assessing the performance of domain-specific models for plant leaf disease classification: a comprehensive benchmark of transfer-learning on open datasets",
+    year = "2025",
+    journal = "Scientific Reports",
+    volume = "15",
+    month = "May",
+    doi = "10.1038/s41598-025-03235-w",
+    url = "https://doi.org/10.1038/s41598-025-03235-w",
+    publisher = "Springer Science and Business Media LLC"
+}
+
+
+@article{shafay2025recentadvancesin,
+    author = "Shafay, Muhammad and Hassan, Taimur and Owais, Muhammad and Hussain, Irfan and Khawaja, Sajid Gul and Seneviratne, Lakmal and Werghi, Naoufel",
+    title = "Recent advances in plant disease detection: challenges and opportunities",
+    volume = "21",
+    issn = "1746-4811",
+    url = "https://doi.org/10.1186/s13007-025-01450-0",
+    doi = "10.1186/s13007-025-01450-0",
+    number = "1",
+    journal = "Plant Methods",
+    publisher = "Springer Science and Business Media LLC",
+    year = "2025",
+    month = "Oct",
+    issue = "1"
+}
+
+
+@article{ishiezeUnknownyearmachineintelligencein,
+    author = "Ishieze, PU and Enyi, JI and Adewuyi, SO and Baiyeri, KP",
+    title = "Machine Intelligence in Horticulture: Automating Pest and Disease Detection in Solanaceous Plants",
+    year = "Unknown year",
+    journal = "Unknown journal"
+}
+
+
+@article{upadhyay2025deeplearningand,
+    author = "Upadhyay, Abhishek and Chandel, Narendra Singh and Singh, Krishna Pratap and Chakraborty, Subir Kumar and Nandede, Balaji M. and Kumar, Mohit and Subeesh, A. and Upendar, Konga and Salem, Ali and Elbeltagi, Ahmed",
+    title = "Deep learning and computer vision in plant disease detection: a comprehensive review of techniques, models, and trends in precision agriculture",
+    year = "2025",
+    journal = "Artif. Intell. Rev.",
+    volume = "58",
+    pages = "92",
+    month = "Jan",
+    doi = "10.1007/s10462-024-11100-x",
+    url = "https://doi.org/10.1007/s10462-024-11100-x",
+    publisher = "Springer Science and Business Media LLC",
+    issue = "3",
+    issn = "1573-7462"
+}
+
+
+@article{shoaib2025leveragingdeeplearning,
+    author = "Shoaib, Muhammad and Sadeghi-Niaraki, Abolghasem and Ali, Farman and Hussain, Irfan and Khalid, Shah",
+    title = "Leveraging deep learning for plant disease and pest detection: a comprehensive review and future directions",
+    year = "2025",
+    journal = "Frontiers in Plant Science",
+    volume = "16",
+    month = "Feb",
+    doi = "10.3389/fpls.2025.1538163",
+    url = "https://doi.org/10.3389/fpls.2025.1538163",
+    publisher = "Frontiers Media SA",
+    issn = "1664-462X"
+}
+
+
+@article{silva2023usingmobileedge,
+    author = "da Silva, Jonathan C. F. and Silva, Mateus Coelho and Luz, Eduardo J. S. and Delabrida, Saul and Oliveira, Ricardo A. R.",
+    title = "Using Mobile Edge AI to Detect and Map Diseases in Citrus Orchards",
+    year = "2023",
+    journal = "Sensors",
+    volume = "23",
+    pages = "2165",
+    month = "Feb",
+    doi = "10.3390/s23042165",
+    url = "https://doi.org/10.3390/s23042165",
+    publisher = "MDPI AG",
+    issue = "4",
+    issn = "1424-8220"
+}
+
+
+@article{tang2025areviewon,
+    author = "Tang, Feilong and Porle, Rosalyn R and Yew, Hoe Tung and Wong, Farrah",
+    title = "A Review on Image-Based Methods for Plant Disease Identification in Diverse Data Conditions",
+    year = "2025",
+    journal = "International Journal of Advanced Computer Science and Applications",
+    volume = "16",
+    month = "Jan",
+    doi = "10.14569/ijacsa.2025.0160853",
+    url = "https://doi.org/10.14569/ijacsa.2025.0160853",
+    publisher = "The Science and Information Organization",
+    issue = "8",
+    issn = "2156-5570"
+}
