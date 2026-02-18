@@ -81,3 +81,44 @@ We respectfully argue that this comparison highlights the central **efficiency c
 We have strengthened the justification in Section 3.2.
 *   **Biological Basis:** The 11-class mapping is not arbitrary; it groups diseases by **pathogen type** (e.g., all Rusts, all Mildews) which dictate the **chemical treatment**. For a farmer, knowing "It's a Rust" (which requires Azoxystrobin) is more actionable than distinguishing "Wheat Stripe Rust" from "Wheat Leaf Rust" if the treatment is identical.
 *   **Performance:** Empirical results show that this grouping improves Macro F1-scores (from 0.86 to 0.88), indicating that the model captures these fundamental pathological signatures more robustly than fine-grained variants.
+
+---
+
+### **Response to Reviewer 2**
+
+We thank Reviewer 2 for their detailed feedback on the structure, writing style, and content depth. We have addressed each point below.
+
+#### **1. AI Writing & Citation Style**
+**Comment:** *Please reduce the AI writing report to less than 20%... Please follow the proper citation. Arrange it in chronological order.*
+**Response:**
+We have meticulously revised the manuscript to ensure a natural, academic tone, rewriting sections flagged as AI-generated. We have also unified the citation style (using the `elsarticle-harv` format as per the template) and ordered citations chronologically where appropriate (e.g., "Smith et al. (2015); Jones et al. (2018); Doe et al. (2020)").
+
+#### **2. Expanding Related Work**
+**Comment:** *Discussion is too short. Consider adding sections like Plant Disease Classification using DL... Discussion about PCA and SVC.*
+**Response:**
+We have significantly expanded Section 2 (Related Work) to include:
+*   **Deep Learning in Plant Pathology:** A review of recent CNN and Transformer applications (2015–2024).
+*   **Dimensionality Reduction & Classical ML:** A new subsection discussing the theoretical basis of PCA and SVC in high-dimensional feature spaces, justifying their use over end-to-end deep learning for resource-constrained scenarios.
+
+#### **3. Novelty & Label Engineering**
+**Comment:** *Elaborate on advantages/novelty... Consider a section discussing label engineering.*
+**Response:**
+*   **Novelty:** We clarified in Section 2.3 and the Introduction that our novelty lies in **decoupling** modern object detection features (YOLOv8) from classification to achieve real-time retraining on CPUs—a critical advantage for edge devices.
+*   **Label Engineering:** We added a dedicated subsection in Methodology explaining the **agronomical justification** for our 11-class grouping (grouping by fungicide treatment protocol), supporting it with the improved F1-scores observed in our results.
+
+#### **4. Algorithm & Dataset Details**
+**Comment:** *Have a discussion or explanation about your Algorithm... Further elaborate your discussion about your dataset section 3.1.*
+**Response:**
+*   **Algorithm 1:** We added a step-by-step walkthrough in the text referencing Algorithm 1, calculating the computational complexity of the projection step $O(d \cdot n)$.
+*   **Dataset:** We expanded Section 3.1 to detail PlantWildV2's collection methodology, geographic diversity, and our own empirical analysis of its background bias (12.87% vs ~49% in PlantVillage), as requested.
+
+#### **5. Figures & Metrics**
+**Comment:** *Elaborate your discussion for Figures 3-4. Include the evaluation metrics discussion.*
+**Response:**
+*   **Figures:** We expanded the captions and text for Figures 3 (Feature Visualization) and 4 (Variance Explained) to explicitly interpret the clusters and the "elbow point" in the variance plot.
+*   **Metrics:** We added a formal definition of the metrics used (Precision, Recall, F1-Macro, Accuracy) in the Experimental Design section to ensure clarity.
+
+#### **6. References**
+**Comment:** *Consider adding more references, at least 50 references.*
+**Response:**
+We have conducted a comprehensive literature review and expanded our bibliography to **50+ references**, prioritizing reputable journals (e.g., *Computers and Electronics in Agriculture*, *IEEE Access*, *Frontiers in Plant Science*) from the last 10 years (2014–2024).
