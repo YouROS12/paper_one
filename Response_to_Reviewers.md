@@ -84,6 +84,22 @@ We have strengthened the justification in Section 3.2.
 
 ---
 
+### **General Assessment (Reviewer 1 Criteria)**
+
+**Comment:** *a. Is the quality of the figures and tables satisfactory? (No)*
+**Response:** We have addressed this by resizing Figure 1 to full-width, clarifying the captions for Figures 3-5 (explaining clusters and baselines), and checking all tables for consistent formatting.
+
+**Comment:** *b. Does the reference list cover the relevant literature adequately and in an unbiased manner? (No)*
+**Response:** We have significantly expanded the bibliography to include over 50 citations, covering seminal works in plant pathology as well as the latest deep learning architectures (Transformers, YOLO) to ensure balanced coverage.
+
+**Comment:** *c. Are the statistical methods valid and correctly applied? (No)*
+**Response:** We have standardized our evaluation metrics (Accuracy, Precision, Recall, F1-Macro) as defined in the revised Experimental Design. Results are derived from a robust training protocol using cross-validated concepts where applicable (e.g., consistent train/test splits).
+
+**Comment:** *e. Are the methods sufficiently documented to allow replication studies? (No)*
+**Response:** We have added a detailed textual explanation of Algorithm 1, including complexity analysis ($O(d \cdot n)$), and explicitly listed all hyperparameters for the YOLO backbone (Layer 8) and IPCA (n=100) to guarantee reproducibility.
+
+---
+
 ### **Response to Reviewer 2**
 
 We thank Reviewer 2 for their detailed feedback on the structure, writing style, and content depth. We have addressed each point below.

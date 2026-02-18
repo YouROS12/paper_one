@@ -54,8 +54,9 @@ Ensure that every claim in the **Methodology**, **Experimental Design**, and **R
     2.  **Label Engineering**: Add a subsection in Methodology explaining the *agronomical* reason for 11 classes (fungicide treatments).
     3.  **Dataset (Section 3.1)**: Add the background bias numbers (12.87% vs ~49%).
     4.  **Algorithm 1**: Add text specifically explaining the steps in Algorithm 1, including Big-O complexity ($O(d \cdot n)$).
-    5.  **Figures 3-4**: Expand captions to explain clusters and "elbow points".
     6.  **Metrics**: Define Precision, Recall, F1, Accuracy formally.
+    7.  **Statistical Rigor**: Mention that results are derived from robust protocols (e.g., standard splits). If the code supports it (check `final_exp_plantwild_cusvm.py`), mention the use of multiple random seeds to ensure validity.
+    8.  **Methods Documentation**: Ensure Algorithm 1 is described *step-by-step* in the text, maximizing reproducibility.
 *   **Bibliography**:
     *   **Action**: You MUST expand `biblio.bib` to include at least **50 references**.
     *   **Source**: Use your internal knowledge to generate correct BibTeX entries for reputable Plant Pathology/DL papers from journals like *Computers and Electronics in Agriculture*, *IEEE Access*, *Frontiers in Plant Science* (2014-2024).
