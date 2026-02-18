@@ -38,8 +38,20 @@ Ensure that every claim in the **Methodology**, **Experimental Design**, and **R
     *   *If exact numbers are missing*: Ensure the *structure* of the table matches the definition of experiments in `src/preprocessing.py` (i.e., ResNet, EfficientNet, YOLO vs IPCA, SVD).
     *   **Champion Model**: The paper claims **87.52%** accuracy for YOLOv8m + IPCA. VALIDATE this against the strongest result implied by the codebase or available CSVs.
 
-### 4. Tone and Formatting
-*   **Output Format**: Provide the **full updated LaTeX code** for the modified sections, or the entire file if requested.
+### 4. Special Reviewer Instructions (MANDATORY UPDATES)
+You must update the text to address these specific reviewer criticisms:
+
+*   **Figure 1 Size**: "Figure 1 appears too small." -> **Action**: Update the LaTeX for `fig:system_architecture` to use `width=\textwidth` or `height=0.95\textheight` to maximize size.
+*   **Dataset Bias Justification**: The reviewer asks why PlantWildV2 is better than PlantVillage. -> **Action**: In Section 3.1, explicitly mention the "8-pixel background experiment" (lines 177-178 of `main.tex`). Emphasize that while not perfect (12.87%), it is drastically better than the lab-bias benchmark (~49%). This *empirical evidence* is already in the text but needs to be highlighted as the direct answer to this critique.
+*   **Feature Extraction Clarity**: "What occurs when two similar classes from different image?" -> **Action**: Clarify in Section 3.3 that features are extracted *per image* and stored independently. The class labels are associated with each feature vector, handling class overlap naturally.
+*   **Figure 5 Clarity**: "Explain what the black (100) and yellow (1) lines represent." -> **Action**: Update the caption for `fig:ablation_plot` (or relevant figure) to explicitly state that vertical lines mark specific component thresholds (e.g., $n=100$ as the optimal point).
+*   **"Fair Comparison" Defense**: The reviewer claims Experiment 4.4 is unfair because baselines are end-to-end. -> **Action**:
+    1.  Refute this by highlighting **Experiment 2** (Table \ref{tab:master_results_summary}), where **ALL** models (ResNet, EfficientNet, YOLO) were used as **feature extractors** under the exact same pipeline. This IS the fair comparison the reviewer asked for, and YOLO won.
+    2.  For the end-to-end comparison (Table \ref{tab:benchmark}), frame it not as a "fair competition" but as a "Cost-Benefit Analysis" showing that our cheap method rivals expensive SOTA methods.
+*   **Label Engineering Justification**: "Insufficient justification." -> **Action**: Strengthen Section 3.2. Explicitly state that the "Treatment-Based" mapping was validated by a **plant pathology expert** (as mentioned in line 217) and aligns with real-world fungicide application protocols, reducing *clinical* ambiguity even if visual ambiguity remains.
+
+### 5. Tone and Formatting
+*   **Output Format**: Provide the **full updated LaTeX code** for the modified sections.
 *   **Precision**: Use specific terms (e.g., "Layer 8 C2f block" instead of "an intermediate layer").
 *   **Style**: Maintain high-quality academic English.
 
