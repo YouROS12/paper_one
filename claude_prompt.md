@@ -5,7 +5,8 @@ You are acting as the **Lead Academic Editor** for a research paper on **AI in P
 1.  `src/preprocessing.py`: Defines the data processing pipeline, feature extraction (YOLO layer 8), and label engineering (11-class mapping).
 2.  `src/training_and_evaluation.py`: Defines the classifier training (SVC settings), evaluation metrics, and experimental loop.
 3.  `src/plot_results.py`: Generates the figures (confusion matrices, bar charts). Use this to verify figure captions and descriptions.
-4.  `paper_updated/paper_exported_from_overleaf/main.tex`: The LaTeX source file that needs to be updated.
+4.  `archive/final_exp_plantwild_cusvm.py`: **Context for Model Choice**. This shows our preliminary exploration. We settled on SVC to demonstrate that **YOLOv8 features are so robust** that even a standard classifier yields high performance. The focus is on **Backbone Quality**, not Classifier Superiority.
+5.  `paper_updated/paper_exported_from_overleaf/main.tex`: The LaTeX source file that needs to be updated.
 
 **Your Goal:**
 Ensure that every claim in the **Methodology**, **Experimental Design**, and **Results** sections of `main.tex` is strictly supported by the code in `src/`. If the code differs from the text, UPDATE THE TEXT to match the code.
@@ -23,7 +24,10 @@ Ensure that every claim in the **Methodology**, **Experimental Design**, and **R
     *   **Action**: Update the "Treatment-Based Grouping" description in Section \ref{sec:methodology} to list the *exact* super-classes defined in the code (e.g., `fungal_rust`, `fungal_powdery_mildew`, `abiotic_disorder`, etc.). The paper uses vague terms; make them precise code-matched terms where appropriate.
 
 ### 2. Experimental Setup
-*   **Classifier**:
+*   **Classifier Rationale**:
+    *   The paper's core argument is that **YOLOv8 features are so rich** that a standard classifier like **SVC** is sufficient to achieve high accuracy.
+    *   **Action**: Ensure the narrative focuses on the **Efficiency** and **Feature Quality** of the YOLO backbone. Use `archive/final_exp_plantwild_cusvm.py` only to show that we explored options, but the final choice of SVC highlights the power of the features (i.e., "We don't need complex ensembles when the features are this good").
+*   **Classifier Hyperparameters**:
     *   Check `src/training_and_evaluation.py`. The classifier is an **SVC** with `kernel='rbf'`, `class_weight='balanced'`, and `probability=True`. Ensure Section \ref{sec:methodology} mentions these specific hyperparameters.
 *   **Reproducibility**:
     *   The code now saves trained models as `.joblib` files. Mention this in the implementation details if relevant.
