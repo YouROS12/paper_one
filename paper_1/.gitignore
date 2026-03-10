@@ -9,3 +9,15 @@ plantwild_temp/
 reviewers_suggestion_paper1/
 .vscode/
 .idea/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.spl
+*.synctex.gz
+*.toc
+*.lot
+*.lof
