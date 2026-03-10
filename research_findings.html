@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plant Disease Detection — Research Findings</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#f0f4ff;
+  --navy2:#f7f9ff;
+  --navy3:#e8eef8;
+  --navy4:#d6e0f5;
+  --panel:#eaf0fb;
+  --paper:#1a2540;
+  --paper2:#243058;
+  --rule:#c2cfe8;
+  --rule2:#d6e0f5;
+  --blue:#1a6fd4;
+  --blue2:#1558b0;
+  --cyan:#0077cc;
+  --teal:#0a9278;
+  --amber:#b86e00;
+  --rose:#c0325a;
+  --text:#0f1e3d;
+  --text-mid:#2d4070;
+  --text-light:#6678a0;
+  --hi-b:rgba(26,111,212,.09);
+  --hi-c:rgba(0,119,204,.08);
+  --hi-t:rgba(10,146,120,.08);
+  --hi-a:rgba(184,110,0,.08);
+  --hi-r:rgba(192,50,90,.08);
+}
+html,body{width:100%;height:100%;overflow:hidden;
+  background:#dce6f7;font-family:'Source Serif 4',Georgia,serif}
+
+/* ── DECK ── */
+#deck{width:100%;height:100%;position:relative}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;transition:opacity .38s ease;
+  background:var(--navy2);overflow:hidden}
+.slide.active{opacity:1;pointer-events:all}
+
+/* ── CHROME ── */
+.bar{height:3px;flex-shrink:0;
+  background:linear-gradient(90deg,var(--blue2) 0%,var(--cyan) 50%,var(--teal) 100%)}
+.hdr{background:#1e3a82;color:#e8f0ff;padding:13px 48px;
+  display:flex;align-items:baseline;justify-content:space-between;flex-shrink:0;
+  border-bottom:1px solid var(--rule)}
+.lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
+.lbl::before{content:'';display:inline-block;width:18px;height:1px;background:#7dd3fc}
+.hdr-sub{font-family:'Playfair Display',serif;font-size:13px;font-weight:400;
+  color:var(--text-light);font-style:italic}
+.body{flex:1;padding:26px 48px 18px;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── TYPE ── */
+.snum{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:3px}
+h2{font-family:'Playfair Display',serif;font-size:clamp(20px,2.5vw,31px);
+  font-weight:400;color:var(--text);line-height:1.2;margin-bottom:3px}
+h2 em{font-style:italic;color:var(--cyan)}
+.rule{height:1px;background:linear-gradient(90deg,var(--blue) 0%,var(--rule) 55%);
+  margin:8px 0 15px}
+p,.bt{font-size:clamp(12px,1.05vw,14px);line-height:1.78;color:var(--text-mid)}
+p strong,.bt strong{color:var(--text);font-weight:600}
+p em{font-style:italic;color:var(--cyan)}
+.lead{font-size:clamp(12.5px,1.1vw,14.5px);color:var(--text);line-height:1.75;
+  border-left:3px solid var(--blue);padding-left:14px;margin-bottom:14px}
+.mono{font-family:'JetBrains Mono',monospace;font-size:11px}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;margin:10px 0;flex-shrink:0}
+.tc{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--text-light);padding:7px 13px;
+  background:var(--navy);border-bottom:1px solid var(--rule)}
+table{width:100%;border-collapse:collapse;font-size:clamp(10.5px,.9vw,12.5px)}
+thead th{background:#2a4a9a;color:#c8dcff;font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;
+  padding:8px 11px;text-align:left;font-weight:400;border-bottom:1px solid var(--rule)}
+tbody tr{border-bottom:1px solid var(--rule2)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(26,111,212,.05)}
+td{padding:8px 11px;color:var(--text-mid);vertical-align:middle}
+td.r{text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px}
+td.m{font-family:'JetBrains Mono',monospace;font-size:10.5px}
+tr.hi-b{background:var(--hi-b)} tr.hi-b td{color:var(--text)}
+tr.hi-b td.s{color:var(--blue);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:10.5px}
+tr.hi-c{background:var(--hi-c)} tr.hi-c td{color:var(--text)}
+tr.hi-c td.s{color:var(--cyan);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:10.5px}
+tr.hi-a{background:var(--hi-a)}
+tr.hi-r{background:var(--hi-r)}
+tr.sep td{background:#dde8f8;font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--text-light);padding:5px 11px}
+.fn{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--text-light);
+  padding:6px 13px;border-top:1px solid var(--rule);line-height:1.6}
+
+/* ── BADGES ── */
+.b{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:7.5px;
+  letter-spacing:.07em;text-transform:uppercase;padding:1px 5px;
+  border-radius:2px;vertical-align:middle;margin-left:4px}
+.bb{background:var(--hi-b);color:var(--blue);border:1px solid rgba(74,158,255,.3)}
+.bc{background:var(--hi-c);color:var(--cyan);border:1px solid rgba(0,212,255,.3)}
+.bt2{background:var(--hi-t);color:var(--teal);border:1px solid rgba(14,184,154,.3)}
+.ba{background:var(--hi-a);color:var(--amber);border:1px solid rgba(245,166,35,.3)}
+.br{background:var(--hi-r);color:var(--rose);border:1px solid rgba(224,92,122,.3)}
+
+/* ── FINDING BOXES ── */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.f{border:1px solid var(--rule);border-left:3px solid var(--blue);
+  padding:11px 14px;background:var(--hi-b);border-radius:0 3px 3px 0}
+.f.cy{border-left-color:var(--cyan);background:var(--hi-c)}
+.f.tl{border-left-color:var(--teal);background:var(--hi-t)}
+.f.am{border-left-color:var(--amber);background:var(--hi-a)}
+.f.ro{border-left-color:var(--rose);background:var(--hi-r)}
+.fl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:5px}
+.f.cy .fl{color:var(--cyan)} .f.tl .fl{color:var(--teal)}
+.f.am .fl{color:var(--amber)} .f.ro .fl{color:var(--rose)}
+.f p{font-size:clamp(11px,.92vw,13px);line-height:1.62;margin:0;color:var(--text-mid)}
+.f p strong{color:var(--text);font-weight:600}
+
+/* ── LAYOUT ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+.sc{background:var(--navy3);color:var(--text);padding:15px 18px;
+  border-radius:3px;text-align:center;border:1px solid var(--rule)}
+.sn{font-family:'Playfair Display',serif;font-size:clamp(26px,2.8vw,40px);
+  color:var(--cyan);display:block;line-height:1.1;margin-bottom:3px}
+.sl{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text-light)}
+.yes{color:var(--teal);font-weight:600} .no{color:var(--text-light)}
+
+/* ── TITLE SLIDE ── */
+.ts{background:#1a3a7a;display:flex;flex-direction:column;
+  justify-content:center;padding:64px 72px;position:relative;overflow:hidden}
+.ts::before{content:'';position:absolute;top:-60px;right:-60px;
+  width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(26,111,212,.06) 0%,transparent 65%);pointer-events:none}
+.ts::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue2) 0%,var(--cyan) 50%,var(--teal) 100%)}
+.ts .grid-bg{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(26,111,212,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(26,111,212,.04) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none}
+.tt-fixed{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--cyan);margin-bottom:20px;
+  display:flex;align-items:center;gap:11px;position:relative}
+.tt::before{content:'';display:inline-block;width:26px;height:1px;background:#7dd3fc}
+.ts h1{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,54px);
+  font-weight:400;color:var(--text);line-height:1.1;max-width:780px;
+  margin-bottom:22px;position:relative}
+.ts h1 em{font-style:italic;color:var(--cyan)}
+.tm{font-family:'JetBrains Mono',monospace;font-size:10.5px;
+  color:var(--text-light);letter-spacing:.07em;line-height:2;position:relative}
+.tm span{color:rgba(200,225,255,.9)}
+
+/* ── ABSTRACT ── */
+.ab{background:#f0f6ff;color:var(--text);padding:24px 30px;border-radius:3px;
+  position:relative;flex:1;display:flex;align-items:center;
+  border:1px solid var(--rule)}
+.ab::before{content:'\201C';font-family:'Playfair Display',serif;font-size:130px;
+  color:rgba(26,111,212,.05);position:absolute;top:-20px;left:18px;
+  line-height:1;pointer-events:none}
+.ab p{color:var(--text-mid);font-size:clamp(12.5px,1.05vw,14.5px);
+  line-height:1.85;position:relative}
+.ab p strong{color:var(--blue);font-weight:600}
+
+/* ── METRICS SLIDE SPECIFIC ── */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:0}
+.metrics-col{display:flex;flex-direction:column;gap:9px;min-height:0;overflow:hidden}
+.metric-def{border:1px solid var(--rule);border-left:3px solid var(--blue);
+  padding:10px 13px;background:var(--hi-b);border-radius:0 3px 3px 0;flex-shrink:0}
+.metric-def.cy{border-left-color:var(--cyan);background:var(--hi-c)}
+.metric-def.ro{border-left-color:var(--rose);background:var(--hi-r)}
+.metric-def.am{border-left-color:var(--amber);background:var(--hi-a)}
+.metric-def .fl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:4px}
+.metric-def.cy .fl{color:var(--cyan)}
+.metric-def.ro .fl{color:var(--rose)}
+.metric-def.am .fl{color:var(--amber)}
+.metric-def p{font-size:clamp(10.5px,.88vw,12.5px);line-height:1.6;margin:0;color:var(--text-mid)}
+.metric-def p strong{color:var(--text);font-weight:600}
+.rank-table-wrap{border:1px solid var(--rule);border-radius:3px;flex-shrink:0}
+.rank-table-cap{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--text-light);padding:6px 11px;
+  background:var(--navy);border-bottom:1px solid var(--rule)}
+.rank-table-wrap table{font-size:clamp(10px,.85vw,12px)}
+.rank-table-wrap thead th{padding:6px 10px;font-size:8px}
+.rank-table-wrap td{padding:6px 10px}
+
+/* ── NAV ── */
+#nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:13px;z-index:100;
+  background:rgba(240,246,255,.96);backdrop-filter:blur(10px);
+  padding:9px 18px;border-radius:40px;border:1px solid rgba(26,111,212,.2)}
+.nb{width:33px;height:33px;border-radius:50%;border:1px solid rgba(26,111,212,.25);
+  background:transparent;color:var(--text-mid);cursor:pointer;font-size:15px;
+  display:flex;align-items:center;justify-content:center;transition:all .2s}
+.nb:hover{background:rgba(26,111,212,.09);color:var(--cyan);
+  border-color:rgba(26,111,212,.4)}
+.nb:disabled{opacity:.2;cursor:not-allowed}
+#sc{font-family:'JetBrains Mono',monospace;font-size:10.5px;
+  color:var(--text-light);min-width:46px;text-align:center;letter-spacing:.04em}
+.dt{display:flex;gap:5px;align-items:center}
+.d{width:5px;height:5px;border-radius:50%;background:rgba(26,111,212,.25);
+  transition:all .25s;cursor:pointer}
+.d.on{background:var(--blue);width:17px;border-radius:3px}
+.kh{position:fixed;top:14px;right:18px;font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;letter-spacing:.09em;color:rgba(26,111,212,.22);z-index:100}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<!-- ── 0: TITLE ── -->
+<div class="slide ts active">
+  <div class="grid-bg"></div>
+  <div class="tt">Research Findings Compendium</div>
+  <h1>Preprocessing Strategies<br>for Plant Disease<br><em>Instance Segmentation</em></h1>
+  <div class="tm">
+    <span>Dataset</span> &nbsp;PlantSeg · 11,458 images · 115 classes · 34 host plants · In-the-wild<br>
+    <span>Model</span> &nbsp;&nbsp;YOLOv11m-seg · 200 epochs · Single NVIDIA A100 40GB · ~9h / strategy<br>
+    <span>Task</span> &nbsp;&nbsp;&nbsp;Instance segmentation · Evaluated on mAP50 + mIoU<br>
+    <span>Status</span> &nbsp;Single seed · Multi-seed validation pending (seeds 123, 456)
+  </div>
+</div>
+
+<!-- ── 1: ABSTRACT ── -->
+<div class="slide">
+  <div class="bar"></div>
+  <div class="hdr"><div class="lbl">Proposed Abstract</div><div class="hdr-sub">Publication-ready draft</div></div>
+  <div class="body">
+    <div class="snum">00</div>
+    <h2>Abstract</h2>
+    <div class="rule"></div>
+    <div class="ab">
+      <p>We present an intelligent preprocessing framework for plant disease instance segmentation on <strong>PlantSeg</strong> — the largest in-the-wild plant disease segmentation dataset, comprising 11,458 images across 115 disease categories. Using a single A100 GPU with approximately 9 hours of training per strategy, our <strong>bounding-box-guided preprocessing achieves 34.12% mIoU</strong>, surpassing DeepLabv3+ ResNet-101 (27.18%) and approaching SAN ViT-B/16 (34.79%) — while requiring 3× fewer parameters, no multi-GPU infrastructure, and remaining fully deployable on edge devices. We further demonstrate that <strong>context-aware mask augmentation improves early convergence but degrades final performance</strong>, revealing that the perceptual gradient between healthy and necrotic tissue constitutes a diagnostically irreplaceable feature signal. Finally, we show empirically that <strong>instance-level metrics (mAP50) expose failure modes invisible to pixel-level metrics (mIoU)</strong> — a methodological contribution to how plant disease models should be evaluated.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── 2: DATASET ── -->
+<div class="slide">
+  <div class="bar"></div>
+  <div class="hdr"><div class="lbl">01 · Dataset</div><div class="hdr-sub">PlantSeg context</div></div>
+  <div class="body">
+    <div class="snum">01</div>
+    <h2>PlantSeg — <em>Benchmark Context</em></h2>
+    <div class="rule"></div>
+    <div class="g3" style="margin-bottom:15px">
+      <div class="sc"><span class="sn">115</span><span class="sl">Disease Classes</span></div>
+      <div class="sc"><span class="sn">11,458</span><span class="sl">In-the-Wild Images</span></div>
+      <div class="sc"><span class="sn">~104</span><span class="sl">Images / Class avg.</span></div>
+    </div>
+    <p style="margin-bottom:11px">Unlike PlantVillage (38 classes, lab conditions) or PlantDoc (27 classes), PlantSeg is captured entirely in the wild — complex backgrounds, variable lighting, occlusions, morphological variation. The 70/10/20 train/val/test split and ~104 images per class make it among the most visually challenging plant disease benchmarks in existence.</p>
+    <div class="fg">
+      <div class="f cy">
+        <div class="fl">Benchmark Gap</div>
+        <p>All prior PlantSeg work uses semantic segmentation evaluated on mIoU only. <strong>This work establishes the first instance segmentation baseline</strong> using a YOLO-family model evaluated on both mAP50 and mIoU.</p>
+      </div>
+      <div class="f">
+        <div class="fl">Annotation Types Available</div>
+        <p>PlantSeg provides both <strong>expert-annotated polygon masks</strong> and derived <strong>bounding box annotations</strong> — enabling the annotation-efficiency analysis central to this work.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 3: PRIMARY RESULTS ── -->
+<div class="slide">
+  <div class="bar"></div>
+  <div class="hdr"><div class="lbl">02 · Primary Results</div><div class="hdr-sub">Strategy comparison</div></div>
+  <div class="body">
+    <div class="snum">02</div>
+    <h2>Preprocessing Strategy <em>Comparison</em></h2>
+    <div class="rule"></div>
+    <div class="tw">
+      <div class="tc">Table 1 — Test Set · YOLOv11m-seg · 200 Epochs · Single A100 40GB · Single seed</div>
+      <table>
+        <thead>
+          <tr><th>Strategy</th><th>Annotation</th><th style="text-align:right">mIoU ↑</th><th style="text-align:right">mAP50 ↑</th><th style="text-align:right">mAP50-95 ↑</th><th style="text-align:right">Precision</th><th style="text-align:right">Recall</th><th style="text-align:right">N Test</th></tr>
+        </thead>
+        <tbody>
+          <tr class="hi-c"><td class="s">mask_guided <span class="b bc">best mAP50</span></td><td>Polygon mask</td><td class="r">33.72%</td><td class="r"><strong>32.69%</strong></td><td class="r">19.95%</td><td class="r">36.6%</td><td class="r">36.7%</td><td class="r">1,146</td></tr>
+          <tr class="hi-b"><td class="s" style="color:var(--blue)">bbox_guided <span class="b bb">best mIoU</span></td><td>Bounding box</td><td class="r"><strong>34.12%</strong></td><td class="r">32.25%</td><td class="r">18.84%</td><td class="r"><strong>38.7%</strong></td><td class="r">35.1%</td><td class="r">1,146</td></tr>
+          <tr><td class="m">mask_guided_aware</td><td>Polygon + aug.</td><td class="r">31.65%</td><td class="r">31.28%</td><td class="r">19.22%</td><td class="r">37.9%</td><td class="r">36.2%</td><td class="r">1,146</td></tr>
+          <tr><td class="m">center_crop</td><td>None</td><td class="r">31.59%</td><td class="r">30.48%</td><td class="r">18.03%</td><td class="r">36.1%</td><td class="r">35.5%</td><td class="r">1,135</td></tr>
+          <tr class="hi-a"><td class="m">random_crop <span class="b ba">anomaly</span></td><td>None</td><td class="r">30.22%</td><td class="r">27.26%</td><td class="r">16.87%</td><td class="r">32.7%</td><td class="r">33.7%</td><td class="r">1,119</td></tr>
+          <tr><td class="m">baseline</td><td>None</td><td class="r">27.93%</td><td class="r">29.83%</td><td class="r">17.57%</td><td class="r">30.2%</td><td class="r">36.5%</td><td class="r">1,146</td></tr>
+        </tbody>
+      </table>
+      <div class="fn">mIoU computed by converting instance masks to semantic label maps via class-union projection. Single seed — multi-seed validation pending.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 4: KEY FINDINGS ── -->
+<div class="slide">
+  <div class="bar"></div>
+  <div class="hdr"><div class="lbl">03 · Key Findings</div><div class="hdr-sub">What the results say</div></div>
+  <div class="body">
+    <div class="snum">03</div>
+    <h2>Four <em>Key Findings</em></h2>
+    <div class="rule"></div>
+    <div class="fg">
+      <div class="f">
+        <div class="fl">Finding 1 — Dual Winner</div>
+        <p><strong>mask_guided leads mAP50 (32.69%)</strong>, bbox_guided leads mIoU (34.12%). Margin under 0.5% on both. Jointly optimal for different use cases: bbox_guided for pixel-level disease area quantification; mask_guided for instance-level detection.</p>
+      </div>
+      <div class="f cy">
+        <div class="fl">Finding 2 — The Context Signal</div>
+        <p>mask_guided_aware underperforms mask_guided despite using identical spatial guidance plus augmentation. <strong>The healthy-to-necrotic boundary suppressed by augmentation is diagnostically informative.</strong> The model actively exploits this perceptual gradient.</p>
+      </div>
+      <div class="f am">
+        <div class="fl">Finding 3 — The random_crop Anomaly</div>
+        <p>random_crop ranks <strong>last on mAP50 (27.26%) but 5th on mIoU (30.22%)</strong> — above baseline. Clearest empirical proof that mIoU and mAP50 measure fundamentally different model capabilities.</p>
+      </div>
+      <div class="f tl">
+        <div class="fl">Finding 4 — Annotation Efficiency</div>
+        <p>bbox_guided (bounding boxes only) beats mask_guided on mIoU by +0.40%, losing mAP50 by only −0.44%. <strong>Expensive polygon annotation is not justified</strong> when pixel-level quantification is the primary goal.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 5: COMPUTATIONAL COMPARISON ── -->
+<div class="slide">
+  <div class="bar"></div>
+  <div class="hdr"><div class="lbl">04 · Computational Comparison</div><div class="hdr-sub">vs. prior PlantSeg benchmarks</div></div>
+  <div class="body">
+    <div class="snum">04</div>
+    <h2>Efficiency vs. <em>Prior Benchmarks</em></h2>
+    <div class="rule"></div>
+    <div class="tw">
+      <div class="tc">Table 2 — Model Complexity · Training hardware and time not reported by PlantSeg authors — omitted to avoid unverified claims</div>
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Backbone</th><th style="text-align:right">Params</th><th style="text-align:right">GFLOPs</th><th>Multi-GPU</th><th>Edge</th><th style="text-align:right">mIoU</th><th style="text-align:right">mAP50</th></tr>
+        </thead>
+        <tbody>
+          <tr class="sep"><td colspan="8">Prior Work — Semantic Segmentation (PlantSeg Paper)</td></tr>
+          <tr><td>DeepLabv3</td><td class="m">ResNet-50</td><td class="r">~40M †</td><td class="r">~65G †</td><td class="no">—</td><td class="no">✗</td><td class="r">17.24%</td><td class="r no">—</td></tr>
+          <tr><td>DeepLabv3</td><td class="m">ResNet-101</td><td class="r">~59M †</td><td class="r">~85G †</td><td class="no">—</td><td class="no">✗</td><td class="r">20.72%</td><td class="r no">—</td></tr>
+          <tr><td>DeepLabv3+</td><td class="m">ResNet-50</td><td class="r">~43M †</td><td class="r">~67G †</td><td class="no">—</td><td class="no">✗</td><td class="r">25.08%</td><td class="r no">—</td></tr>
+          <tr><td>DeepLabv3+</td><td class="m">ResNet-101</td><td class="r">~62M †</td><td class="r">~88G †</td><td class="no">—</td><td class="no">✗</td><td class="r">27.18%</td><td class="r no">—</td></tr>
+          <tr><td>SAN</td><td class="m">ViT-B/16</td><td class="r">~86M †</td><td class="r">~195G †</td><td class="no">—</td><td class="no">✗</td><td class="r">34.79%</td><td class="r no">—</td></tr>
+          <tr><td>SAN</td><td class="m">ViT-L/14</td><td class="r">~307M †</td><td class="r">~810G †</td><td class="no">—</td><td class="no">✗</td><td class="r">36.91%</td><td class="r no">—</td></tr>
+          <tr><td>SegNeXt</td><td class="m">MSCAN-L</td><td class="r"><strong>49M ✓</strong></td><td class="r"><strong>70G ✓</strong></td><td class="no">Yes (8 GPUs) ✓</td><td class="no">✗</td><td class="r"><strong>44.52%</strong></td><td class="r no">—</td></tr>
+          <tr class="sep"><td colspan="8">This Work — Instance Segmentation · Single A100 · ~9h / strategy</td></tr>
+          <tr style="background:rgba(26,111,212,.06)"><td>Ours — baseline</td><td class="m">YOLOv11m</td><td class="r"><strong>~20M</strong></td><td class="r"><strong>~40G</strong></td><td class="yes">No (1 GPU)</td><td class="yes">✓</td><td class="r">27.93%</td><td class="r">29.83%</td></tr>
+          <tr class="hi-b"><td><strong>Ours — bbox_guided</strong></td><td class="m">YOLOv11m</td><td class="r"><strong>~20M</strong></td><td class="r"><strong>~40G</strong></td><td class="yes">No (1 GPU)</td><td class="yes">✓</td><td class="r"><strong>34.12%</strong></td><td class="r">32.25%</td></tr>
+          <tr class="hi-c"><td><strong>Ours — mask_guided</strong></td><td class="m">YOLOv11m</td><td class="r"><strong>~20M</strong></td><td class="r"><strong>~40G</strong></td><td class="yes">No (1 GPU)</td><td class="yes">✓</td><td class="r">33.72%</td><td class="r"><strong>32.69%</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="fn">† = estimated from architecture papers, not confirmed in PlantSeg training logs. ✓ = confirmed from official sources. Edge = compatible with Jetson Nano / RPi5 class devices.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 6: METRICS — COMPACT FIT ── -->
+<div class="slide">
+  <div class="bar"></div>
+  <div class="hdr"><div class="lbl">05 · Metrics Analysis</div><div class="hdr-sub">mIoU vs mAP50</div></div>
+  <div class="body">
+    <div class="snum">05</div>
+    <h2>Why <em>Both Metrics</em> Matter</h2>
+    <div class="rule"></div>
+    <div class="metrics-grid">
+      <!-- LEFT: definitions + proof -->
+      <div class="metrics-col">
+        <div class="metric-def">
+          <div class="fl">mIoU — Pixel-level metric</div>
+          <p>Per-pixel class correctness averaged over classes. <strong>Does not penalize missed instances.</strong> A class absent from both prediction and GT is skipped — forgiving by design.</p>
+        </div>
+        <div class="metric-def cy">
+          <div class="fl">mAP50 — Instance-level metric</div>
+          <p>Requires simultaneous <strong>detection + localization (≥50% IoU) + classification</strong> of every individual instance. No partial credit. Penalizes every missed detection directly.</p>
+        </div>
+        <div class="metric-def ro">
+          <div class="fl">The random_crop Proof</div>
+          <p>5th on mIoU, <strong>last on mAP50</strong>. Diverse crops improve pixel coverage in aggregate while destroying instance detection. A model appears adequate on pixels while catastrophically failing on instances.</p>
+        </div>
+        <div class="metric-def am">
+          <div class="fl">Methodological Contribution</div>
+          <p>No prior PlantSeg benchmark reports mAP50. <strong>This divergence is publishable on its own</strong> — it reveals a systematic gap in how plant disease models have been evaluated.</p>
+        </div>
+      </div>
+      <!-- RIGHT: ranking table -->
+      <div class="metrics-col">
+        <div class="rank-table-wrap">
+          <div class="rank-table-cap">Ranking Divergence Across Strategies</div>
+          <table>
+            <thead>
+              <tr><th>Strategy</th><th style="text-align:right">mIoU Rank</th><th style="text-align:right">mAP50 Rank</th><th style="text-align:right">Δ</th><th style="text-align:right">mIoU</th><th style="text-align:right">mAP50</th></tr>
+            </thead>
+            <tbody>
+              <tr class="hi-b"><td class="m s" style="color:var(--blue)">bbox_guided</td><td class="r">1st</td><td class="r">2nd</td><td class="r" style="color:var(--teal)">+1</td><td class="r">34.12%</td><td class="r">32.25%</td></tr>
+              <tr class="hi-c"><td class="m s">mask_guided</td><td class="r">2nd</td><td class="r">1st</td><td class="r" style="color:var(--rose)">−1</td><td class="r">33.72%</td><td class="r">32.69%</td></tr>
+              <tr><td class="m">mask_guided_aware</td><td class="r">4th</td><td class="r">3rd</td><td class="r" style="color:var(--rose)">−1</td><td class="r">31.65%</td><td class="r">31.28%</td></tr>
+              <tr><td class="m">center_crop</td><td class="r">3rd</td><td class="r">4th</td><td class="r" style="color:var(--teal)">+1</td><td class="r">31.59%</td><td class="r">30.48%</td></tr>
+              <tr class="hi-a"><td class="m">random_crop ⚠</td><td class="r">5th</td><td class="r">6th</td><td class="r" style="color:var(--teal)">+1</td><td class="r">30.22%</td><td class="r">27.26%</td></tr>
+              <tr><td class="m">baseline</td><td class="r">6th</td><td class="r">5th</td><td class="r" style="color:var(--rose)">−1</td><td class="r">27.93%</td><td class="r">29.83%</td></tr>
+            </tbody>
+          </table>
+          <div class="fn">random_crop anomaly: ranks 5th on mIoU but last on mAP50 — 3-rank gap is the key evidence.</div>
+        </div>
+        <!-- gap bar visual -->
+        <div style="border:1px solid var(--rule);border-radius:3px;padding:12px 14px;background:#e8f0fb">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:9px">mIoU vs mAP50 — Score Gap per Strategy</div>
+          <div id="bars"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 7: NARRATIVE ── -->
+<div class="slide">
+  <div class="bar"></div>
+  <div class="hdr"><div class="lbl">06 · Paper Narrative</div><div class="hdr-sub">Recommended story arc</div></div>
+  <div class="body">
+    <div class="snum">06</div>
+    <h2>Recommended <em>Story Arc</em></h2>
+    <div class="rule"></div>
+    <div class="lead">Present strategies as baseline → random_crop → bbox_guided → mask_guided_aware → mask_guided. Each row has a defined narrative role — transforms a partially falsified hypothesis into a scientific discovery.</div>
+    <div class="tw">
+      <div class="tc">Narrative Ordering for Main Results Table</div>
+      <table>
+        <thead><tr><th>#</th><th>Strategy</th><th>Narrative Role</th><th style="text-align:right">mIoU</th><th style="text-align:right">mAP50</th></tr></thead>
+        <tbody>
+          <tr><td class="m">1</td><td class="m">baseline</td><td>Control — no spatial intelligence</td><td class="r">27.93%</td><td class="r">29.83%</td></tr>
+          <tr><td class="m">2</td><td class="m">random_crop</td><td>Naïve augmentation — mixed signal, anomaly demonstrated</td><td class="r">30.22%</td><td class="r">27.26%</td></tr>
+          <tr><td class="m">3</td><td class="m">bbox_guided</td><td>Disease-aware cropping — first strong gain, low annotation cost</td><td class="r">34.12%</td><td class="r">32.25%</td></tr>
+          <tr><td class="m">4</td><td class="m">mask_guided_aware</td><td>Mask + augmentation — context suppression penalty revealed</td><td class="r">31.65%</td><td class="r">31.28%</td></tr>
+          <tr class="hi-c"><td class="m">5</td><td class="s">mask_guided ✦</td><td>Mask only — boundary signal preserved, best instance detection</td><td class="r"><strong>33.72%</strong></td><td class="r"><strong>32.69%</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="fn">center_crop omitted from main narrative — included in full ablation appendix for transparency.</div>
+    </div>
+    <div class="f cy" style="margin-top:12px">
+      <div class="fl">The Core Insight</div>
+      <p>The healthy-to-necrotic tissue boundary is not background noise — it is a <strong>diagnostic feature the network actively exploits</strong>. Suppressing it via augmentation carries a measurable, reproducible performance cost. This has not been published on PlantSeg before.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── 8: PUBLICATION ── -->
+<div class="slide">
+  <div class="bar"></div>
+  <div class="hdr"><div class="lbl">07 · Publication Strategy</div><div class="hdr-sub">Venues & remaining work</div></div>
+  <div class="body">
+    <div class="snum">07</div>
+    <h2>Publication <em>Strategy</em></h2>
+    <div class="rule"></div>
+    <div class="g2" style="gap:16px">
+      <div>
+        <div class="tw">
+          <div class="tc">Target Venues</div>
+          <table>
+            <thead><tr><th>Journal</th><th>Q1 Cat.</th><th style="text-align:right">IF</th><th style="text-align:right">APC</th><th>Fit</th></tr></thead>
+            <tbody>
+              <tr class="hi-b"><td><strong>Computers &amp; Electronics in Agriculture</strong></td><td>Ag Eng.</td><td class="r">8.3</td><td class="r">~$3,500</td><td><span class="b bb">Primary</span></td></tr>
+              <tr><td>Frontiers in Plant Science</td><td>Plant Sci.</td><td class="r">5.6</td><td class="r">~$3,200</td><td><span class="b bt2">Backup</span></td></tr>
+              <tr><td>Biosystems Engineering</td><td>Ag Eng.</td><td class="r">5.1</td><td class="r">~$2,800</td><td><span class="b ba">Backup</span></td></tr>
+              <tr><td>IEEE Access</td><td>Eng.</td><td class="r">3.9</td><td class="r">~$1,950</td><td><span class="b ba">Budget</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="tw">
+          <div class="tc">Remaining Work Checklist</div>
+          <table>
+            <thead><tr><th>Task</th><th>Priority</th><th>Est.</th></tr></thead>
+            <tbody>
+              <tr><td>Multi-seed runs (123, 456) — top 3 strategies</td><td><span class="b br">Critical</span></td><td class="m">2–3w</td></tr>
+              <tr><td>Epoch convergence curves (epoch 34 crossover)</td><td><span class="b br">Critical</span></td><td class="m">Ready</td></tr>
+              <tr><td>mIoU methodology paragraph in Methods</td><td><span class="b ba">Important</span></td><td class="m">1d</td></tr>
+              <tr><td>Per-class mAP distribution (violin / box plot)</td><td><span class="b bt2">Recommended</span></td><td class="m">2–3d</td></tr>
+              <tr><td>Full 6-strategy ablation in appendix</td><td><span class="b bt2">Recommended</span></td><td class="m">1d</td></tr>
+            </tbody>
+          </table>
+          <div class="fn">Target submission window: 7–8 weeks · Critical path = multi-seed runs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<div id="nav">
+  <button class="nb" id="bp" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="dt" id="dots"></div>
+  <span id="sc">1 / 9</span>
+  <button class="nb" id="bn" onclick="go(1)">&#8594;</button>
+</div>
+<div class="kh">← → arrow keys</div>
+
+<script>
+// mini bar chart for slide 6
+const barData=[
+  {label:'bbox_guided',  miou:34.12, map:32.25},
+  {label:'mask_guided',  miou:33.72, map:32.69},
+  {label:'mask_guided_aware', miou:31.65, map:31.28},
+  {label:'center_crop',  miou:31.59, map:30.48},
+  {label:'random_crop',  miou:30.22, map:27.26},
+  {label:'baseline',     miou:27.93, map:29.83},
+];
+const barsEl=document.getElementById('bars');
+barData.forEach(d=>{
+  const gap=Math.abs(d.miou-d.map).toFixed(2);
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:5px';
+  const lbl=document.createElement('div');
+  lbl.style.cssText='font-family:"JetBrains Mono",monospace;font-size:9px;color:rgba(45,64,112,.7);width:118px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+  lbl.textContent=d.label;
+  const track=document.createElement('div');
+  track.style.cssText='flex:1;height:6px;background:rgba(26,111,212,.09);border-radius:2px;position:relative';
+  const mIouBar=document.createElement('div');
+  mIouBar.style.cssText=`position:absolute;left:0;top:0;height:100%;width:${d.miou/50*100}%;background:rgba(26,111,212,.5);border-radius:2px`;
+  const mapBar=document.createElement('div');
+  mapBar.style.cssText=`position:absolute;left:0;top:0;height:100%;width:${d.map/50*100}%;background:rgba(0,119,204,.7);border-radius:2px`;
+  track.appendChild(mIouBar);track.appendChild(mapBar);
+  const gapLbl=document.createElement('div');
+  gapLbl.style.cssText='font-family:"JetBrains Mono",monospace;font-size:9px;color:rgba(184,110,0,.9);width:32px;text-align:right;flex-shrink:0';
+  gapLbl.textContent='Δ'+gap;
+  row.appendChild(lbl);row.appendChild(track);row.appendChild(gapLbl);
+  barsEl.appendChild(row);
+});
+// legend
+const leg=document.createElement('div');
+leg.style.cssText='display:flex;gap:14px;margin-top:6px';
+leg.innerHTML='<span style="font-family:JetBrains Mono,monospace;font-size:8px;color:rgba(26,111,212,.7);display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:rgba(26,111,212,.5);display:inline-block;border-radius:1px"></span>mIoU</span><span style="font-family:JetBrains Mono,monospace;font-size:8px;color:rgba(0,119,204,.8);display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:rgba(0,119,204,.7);display:inline-block;border-radius:1px"></span>mAP50</span>';
+barsEl.appendChild(leg);
+
+// navigation
+const slides=document.querySelectorAll('.slide');
+const dotsEl=document.getElementById('dots');
+const counter=document.getElementById('sc');
+const bp=document.getElementById('bp');
+const bn=document.getElementById('bn');
+let cur=0;const tot=slides.length;
+slides.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.className='d'+(i===0?' on':'');
+  d.onclick=()=>goTo(i);
+  dotsEl.appendChild(d);
+});
+function goTo(n){
+  slides[cur].classList.remove('active');
+  dotsEl.children[cur].classList.remove('on');
+  cur=Math.max(0,Math.min(tot-1,n));
+  slides[cur].classList.add('active');
+  dotsEl.children[cur].classList.add('on');
+  counter.textContent=(cur+1)+' / '+tot;
+  bp.disabled=cur===0;
+  bn.disabled=cur===tot-1;
+}
+function go(d){goTo(cur+d)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
+});
+</script>
+</body>
+</html>
