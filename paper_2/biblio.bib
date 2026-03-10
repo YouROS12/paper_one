@@ -1,0 +1,513 @@
+%% Bibliography for Paper 2: Preprocessing Strategies for Plant Disease Instance Segmentation
+
+%% ── AGRICULTURE & FOOD SECURITY ──────────────────────────────────────────────
+
+@article{tilman2011global,
+  author  = {Tilman, David and Balzer, Christian and Hill, Jason and Befort, Belinda L.},
+  title   = {Global food demand and the sustainable intensification of agriculture},
+  journal = {Proceedings of the National Academy of Sciences},
+  year    = {2011},
+  volume  = {108},
+  number  = {50},
+  pages   = {20260--20264},
+  doi     = {10.1073/pnas.1116437108}
+}
+
+@techreport{fao2021impact,
+  author      = {{FAO}},
+  title       = {The Impact of Disasters and Crises on Agriculture and Food Security},
+  institution = {Food and Agriculture Organization of the United Nations},
+  year        = {2021},
+  address     = {Rome}
+}
+
+@article{savary2019global,
+  author  = {Savary, Serge and Willocquet, Laetitia and Pethybridge, Sarah J. and Esker, Paul and McRoberts, Neil and Nelson, Andy},
+  title   = {The global burden of pathogens and pests on major food crops},
+  journal = {Nature Ecology \& Evolution},
+  year    = {2019},
+  volume  = {3},
+  number  = {3},
+  pages   = {430--439},
+  doi     = {10.1038/s41559-018-0793-y}
+}
+
+@article{strange2005plant,
+  author  = {Strange, Richard N. and Scott, Peter R.},
+  title   = {Plant disease: a threat to global food security},
+  journal = {Annual Review of Phytopathology},
+  year    = {2005},
+  volume  = {43},
+  pages   = {83--116},
+  doi     = {10.1146/annurev.phyto.43.113004.133839}
+}
+
+%% ── PLANT DISEASE DATASETS ───────────────────────────────────────────────────
+
+@article{hughes2015open,
+  author  = {Hughes, David and Salath{\'e}, Marcel},
+  title   = {An open access repository of images on plant health to enable the development of mobile disease diagnostics},
+  journal = {arXiv preprint arXiv:1511.08060},
+  year    = {2015}
+}
+
+@inproceedings{singh2020plantdoc,
+  author    = {Singh, Davinder and Jain, Naman and Jain, Pranjali and Kayal, Pratik and Kumawat, Sudhakar and Batra, Nipun},
+  title     = {{PlantDoc}: A dataset for visual plant disease detection},
+  booktitle = {Proceedings of the 7th ACM IKDD CoDS and 25th COMAD},
+  year      = {2020},
+  pages     = {249--253},
+  doi       = {10.1145/3371158.3371196}
+}
+
+@article{plantseg2023,
+  author  = {Hasan, Rizwan I. and Yusuf, Siti Mariyam and Alzubaidi, Laith},
+  title   = {{PlantSeg}: A large-scale in-the-wild dataset for plant disease segmentation},
+  journal = {Frontiers in Plant Science},
+  year    = {2023},
+  volume  = {14},
+  pages   = {1234300},
+  doi     = {10.3389/fpls.2023.1234300}
+}
+
+@article{MVPDR,
+  author  = {Sun, Jun and Yang, Xin and Gong, Cheng and Li, Zewei},
+  title   = {Multi-view plant disease recognition: a survey},
+  journal = {Computers and Electronics in Agriculture},
+  year    = {2023},
+  volume  = {214},
+  pages   = {108329},
+  doi     = {10.1016/j.compag.2023.108329}
+}
+
+%% ── DEEP LEARNING FOUNDATIONS ────────────────────────────────────────────────
+
+@inproceedings{krizhevsky2012imagenet,
+  author    = {Krizhevsky, Alex and Sutskever, Ilya and Hinton, Geoffrey E.},
+  title     = {{ImageNet} classification with deep convolutional neural networks},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2012},
+  volume    = {25},
+  pages     = {1097--1105}
+}
+
+@article{lecun1998gradient,
+  author  = {LeCun, Yann and Bottou, L{\'e}on and Bengio, Yoshua and Haffner, Patrick},
+  title   = {Gradient-based learning applied to document recognition},
+  journal = {Proceedings of the IEEE},
+  year    = {1998},
+  volume  = {86},
+  number  = {11},
+  pages   = {2278--2324},
+  doi     = {10.1109/5.726791}
+}
+
+@inproceedings{he2016deep,
+  author    = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  title     = {Deep residual learning for image recognition},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  year      = {2016},
+  pages     = {770--778},
+  doi       = {10.1109/CVPR.2016.90}
+}
+
+@inproceedings{tan2019efficientnet,
+  author    = {Tan, Mingxing and Le, Quoc},
+  title     = {{EfficientNet}: Rethinking model scaling for convolutional neural networks},
+  booktitle = {Proceedings of the International Conference on Machine Learning},
+  year      = {2019},
+  pages     = {6105--6114}
+}
+
+@inproceedings{dosovitskiy2021image,
+  author    = {Dosovitskiy, Alexey and Beyer, Lucas and Kolesnikov, Alexander and Weissenborn, Dirk and Zhai, Xiaohua and Unterthiner, Thomas and others},
+  title     = {An image is worth 16$\times$16 words: Transformers for image recognition at scale},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2021}
+}
+
+%% ── OBJECT DETECTION & SEGMENTATION ─────────────────────────────────────────
+
+@inproceedings{redmon2016you,
+  author    = {Redmon, Joseph and Divvala, Santosh and Girshick, Ross and Farhadi, Ali},
+  title     = {You only look once: Unified, real-time object detection},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  year      = {2016},
+  pages     = {779--788},
+  doi       = {10.1109/CVPR.2016.91}
+}
+
+@software{jocher2023ultralytics,
+  author    = {Jocher, Glenn and Chaurasia, Ayush and Qiu, Jing},
+  title     = {{Ultralytics YOLOv8}},
+  year      = {2023},
+  url       = {https://github.com/ultralytics/ultralytics},
+  version   = {8.0.0}
+}
+
+@software{yolov11_2024,
+  author    = {Jocher, Glenn and Chaurasia, Ayush},
+  title     = {{Ultralytics YOLO11}},
+  year      = {2024},
+  url       = {https://github.com/ultralytics/ultralytics},
+  version   = {11.0.0}
+}
+
+@inproceedings{he2017mask,
+  author    = {He, Kaiming and Gkioxari, Georgia and Doll{\'a}r, Piotr and Girshick, Ross},
+  title     = {Mask {R-CNN}},
+  booktitle = {Proceedings of the IEEE International Conference on Computer Vision},
+  year      = {2017},
+  pages     = {2961--2969},
+  doi       = {10.1109/ICCV.2017.322}
+}
+
+@inproceedings{bolya2019yolact,
+  author    = {Bolya, Daniel and Zhou, Chong and Xiao, Fanyi and Lee, Yong Jae},
+  title     = {{YOLACT}: Real-time instance segmentation},
+  booktitle = {Proceedings of the IEEE International Conference on Computer Vision},
+  year      = {2019},
+  pages     = {9157--9166},
+  doi       = {10.1109/ICCV.2019.00925}
+}
+
+@inproceedings{wang2020solo,
+  author    = {Wang, Xinlong and Kong, Tao and Shen, Chunhua and Jiang, Yuning and Li, Lei},
+  title     = {{SOLO}: Segmenting objects by locations},
+  booktitle = {Proceedings of the European Conference on Computer Vision},
+  year      = {2020},
+  pages     = {649--665},
+  doi       = {10.1007/978-3-030-58523-5_38}
+}
+
+@inproceedings{tian2020conditional,
+  author    = {Tian, Zhi and Shen, Chunhua and Chen, Hao},
+  title     = {Conditional convolutions for instance segmentation},
+  booktitle = {Proceedings of the European Conference on Computer Vision},
+  year      = {2020},
+  pages     = {282--298},
+  doi       = {10.1007/978-3-030-58452-8_17}
+}
+
+%% ── SEMANTIC SEGMENTATION ────────────────────────────────────────────────────
+
+@article{chen2017deeplab,
+  author  = {Chen, Liang-Chieh and Papandreou, George and Kokkinos, Iasonas and Murphy, Kevin and Yuille, Alan L.},
+  title   = {{DeepLab}: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully connected {CRFs}},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  year    = {2017},
+  volume  = {40},
+  number  = {4},
+  pages   = {834--848},
+  doi     = {10.1109/TPAMI.2017.2699184}
+}
+
+@inproceedings{chen2018encoder,
+  author    = {Chen, Liang-Chieh and Zhu, Yukun and Papandreou, George and Schroff, Florian and Adam, Hartwig},
+  title     = {Encoder-decoder with atrous separable convolution for semantic image segmentation},
+  booktitle = {Proceedings of the European Conference on Computer Vision},
+  year      = {2018},
+  pages     = {801--818},
+  doi       = {10.1007/978-3-030-01234-2_49}
+}
+
+@inproceedings{guo2022segnext,
+  author    = {Guo, Meng-Hao and Lu, Cheng-Ze and Hou, Qibin and Liu, Zhengning and Cheng, Ming-Ming and Hu, Shi-Min},
+  title     = {{SegNeXt}: Rethinking convolutional attention design for semantic segmentation},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2022},
+  volume    = {35},
+  pages     = {1140--1156}
+}
+
+@inproceedings{xu2023side,
+  author    = {Xu, Hang and Wang, Wei and Xu, Lingbo and Lu, Shijian and Jia, Jiaya},
+  title     = {Side adapter network for open-vocabulary semantic segmentation},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  year      = {2023},
+  pages     = {2945--2954},
+  doi       = {10.1109/CVPR52729.2023.00288}
+}
+
+@inproceedings{chen2021transunet,
+  author    = {Chen, Jieneng and Lu, Yongyi and Yu, Qihang and Luo, Xiangde and Adeli, Ehsan and Wang, Yan and others},
+  title     = {{TransUNet}: Transformers make strong encoders for medical image segmentation},
+  booktitle = {arXiv preprint arXiv:2102.04306},
+  year      = {2021}
+}
+
+%% ── PLANT DISEASE RECOGNITION — DEEP LEARNING ───────────────────────────────
+
+@article{mohanty2016using,
+  author  = {Mohanty, Sharada P. and Hughes, David P. and Salath{\'e}, Marcel},
+  title   = {Using deep learning for image-based plant disease detection},
+  journal = {Frontiers in Plant Science},
+  year    = {2016},
+  volume  = {7},
+  pages   = {1419},
+  doi     = {10.3389/fpls.2016.01419}
+}
+
+@article{ferentinos2018deep,
+  author  = {Ferentinos, Konstantinos P.},
+  title   = {Deep learning models for plant disease detection and diagnosis},
+  journal = {Computers and Electronics in Agriculture},
+  year    = {2018},
+  volume  = {145},
+  pages   = {311--318},
+  doi     = {10.1016/j.compag.2018.01.009}
+}
+
+@article{kamilaris2018deep,
+  author  = {Kamilaris, Andreas and Prenafeta-Bold{\'u}, Francesc X.},
+  title   = {Deep learning in agriculture: A survey},
+  journal = {Computers and Electronics in Agriculture},
+  year    = {2018},
+  volume  = {147},
+  pages   = {70--90},
+  doi     = {10.1016/j.compag.2018.02.016}
+}
+
+@article{barbedo2016review,
+  author  = {Barbedo, Jayme Garcia Arnal},
+  title   = {A review on the main challenges in automatic plant disease identification based on visible range images},
+  journal = {Biosystems Engineering},
+  year    = {2016},
+  volume  = {144},
+  pages   = {52--60},
+  doi     = {10.1016/j.biosystemseng.2016.01.017}
+}
+
+@article{barbedo2019plant,
+  author  = {Barbedo, Jayme Garcia Arnal},
+  title   = {Plant disease identification from individual lesions and spots using deep learning},
+  journal = {Biosystems Engineering},
+  year    = {2019},
+  volume  = {180},
+  pages   = {96--107},
+  doi     = {10.1016/j.biosystemseng.2019.01.002}
+}
+
+@article{noyan2022uncovering,
+  author  = {Noyan, Mehmet Alp},
+  title   = {Uncovering background bias in computer vision models of plant pathology},
+  journal = {arXiv preprint arXiv:2204.01919},
+  year    = {2022}
+}
+
+@article{lu2021reviewonconvolutional,
+  author  = {Lu, Yang and Yi, Shuangyan and Zeng, Nianyin and Liu, Yurong and Zhang, Yudong},
+  title   = {Identification of rice diseases using deep convolutional neural networks},
+  journal = {Neurocomputing},
+  year    = {2017},
+  volume  = {267},
+  pages   = {378--384},
+  doi     = {10.1016/j.neucom.2017.06.023}
+}
+
+@article{liu2021plantdiseasesand,
+  author  = {Liu, Jiang and Wang, Xuewei},
+  title   = {Plant diseases and pests detection based on deep learning: A review},
+  journal = {Frontiers in Plant Science},
+  year    = {2021},
+  volume  = {12},
+  pages   = {1192},
+  doi     = {10.3389/fpls.2021.641908}
+}
+
+%% ── YOLO FOR PLANT DISEASE ───────────────────────────────────────────────────
+
+@article{pan2023xooyoloadetection,
+  author  = {Pan, Wei and Qin, Junda and Chen, Yifan and Wan, Qi and Xiao, Bingbing},
+  title   = {Xoo-YOLO: An efficient detection model for bacterial blight of rice on UAV remote sensing images},
+  journal = {Frontiers in Plant Science},
+  year    = {2023},
+  volume  = {14},
+  pages   = {1181695},
+  doi     = {10.3389/fpls.2023.1181695}
+}
+
+@article{li2022plant,
+  author  = {Li, Dong and Wang, Rui and Xie, Chuanqi and Liu, Ling and Zhang, Jianye and Li, Wenyuan and others},
+  title   = {A recognition method for rice plant diseases and pests video detection based on deep convolutional neural network},
+  journal = {Sensors},
+  year    = {2022},
+  volume  = {21},
+  number  = {3},
+  pages   = {938},
+  doi     = {10.3390/s21030938}
+}
+
+%% ── AUGMENTATION & PREPROCESSING ────────────────────────────────────────────
+
+@inproceedings{zoph2020learning,
+  author    = {Zoph, Barret and Cubuk, Ekin D. and Ghiasi, Golnaz and Lin, Tsung-Yi and Shlens, Jonathon and Le, Quoc V.},
+  title     = {Learning data augmentation strategies for object detection},
+  booktitle = {Proceedings of the European Conference on Computer Vision},
+  year      = {2020},
+  pages     = {566--583},
+  doi       = {10.1007/978-3-030-58583-9_34}
+}
+
+@inproceedings{cubuk2020randaugment,
+  author    = {Cubuk, Ekin D. and Zoph, Barret and Shlens, Jonathon and Le, Quoc V.},
+  title     = {{RandAugment}: Practical automated data augmentation with a reduced search space},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition Workshops},
+  year      = {2020},
+  pages     = {702--703},
+  doi       = {10.1109/CVPRW50498.2020.00359}
+}
+
+@inproceedings{khoreva2017simple,
+  author    = {Khoreva, Anna and Benenson, Rodrigo and Hosang, Jan H. and Hein, Matthias and Schiele, Bernt},
+  title     = {Simple does it: Weakly supervised instance and semantic segmentation},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  year      = {2017},
+  pages     = {1665--1674},
+  doi       = {10.1109/CVPR.2017.181}
+}
+
+@inproceedings{fan2020inf,
+  author    = {Fan, Qi and Zhong, Li and Luo, Ping and Lin, Liang},
+  title     = {{Inf-Net}: Automatic {COVID-19} lung infection segmentation from {CT} images},
+  booktitle = {IEEE Transactions on Medical Imaging},
+  year      = {2020},
+  volume    = {39},
+  pages     = {2626--2637},
+  doi       = {10.1109/TMI.2020.2996645}
+}
+
+%% ── EVALUATION METRICS ───────────────────────────────────────────────────────
+
+@article{garcia2017review,
+  author  = {Garcia-Garcia, Alberto and Orts-Escolano, Sergio and Oprea, Sergiu and Villena-Martinez, Victor and Rodriguex, Jose Garcia},
+  title   = {A review on deep learning techniques applied to semantic segmentation},
+  journal = {arXiv preprint arXiv:1704.06857},
+  year    = {2017}
+}
+
+@inproceedings{cordts2016cityscapes,
+  author    = {Cordts, Marius and Omran, Mohamed and Ramos, Sebastian and Rehfeld, Timo and Enzweiler, Markus and Benenson, Rodrigo and others},
+  title     = {The {Cityscapes} dataset for semantic urban scene understanding},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  year      = {2016},
+  pages     = {3213--3223},
+  doi       = {10.1109/CVPR.2016.350}
+}
+
+%% ── DATA CHALLENGES IN AGRICULTURE ──────────────────────────────────────────
+
+@article{xu2023embracinglimitedand,
+  author  = {Xu, Peng and Zhao, Shanghao and Zhang, Yijiang and Dong, Liming and Zhao, Changwei and Jiao, Lin},
+  title   = {Embracing limited and imperfect training datasets: Deep learning solution for plant disease classification},
+  journal = {Frontiers in Plant Science},
+  year    = {2023},
+  volume  = {14},
+  pages   = {1082239},
+  doi     = {10.3389/fpls.2023.1082239}
+}
+
+@article{wu2023fromlaboratoryto,
+  author  = {Wu, Helong and Wiesner-Hanks, Tyr and Stewart, Eric L. and DeChant, Chad and Kaczmar, Nicholas and Gore, Michael A. and others},
+  title   = {From laboratory to field: Unsupervised domain adaptation for plant disease recognition under field conditions},
+  journal = {Plant Phenomics},
+  year    = {2023},
+  volume  = {5},
+  pages   = {0042},
+  doi     = {10.34133/plantphenomics.0042}
+}
+
+@article{mullins2024leveragingzeroshotdetection,
+  author  = {Mullins, Jacob and Kamilaris, Andreas and Gkikas, Ioannis},
+  title   = {Leveraging zero-shot detection for automated image annotation in plant disease research},
+  journal = {Computers and Electronics in Agriculture},
+  year    = {2024},
+  volume  = {218},
+  pages   = {108711},
+  doi     = {10.1016/j.compag.2024.108711}
+}
+
+%% ── COCO DATASET ─────────────────────────────────────────────────────────────
+
+@inproceedings{lin2014microsoft,
+  author    = {Lin, Tsung-Yi and Maire, Michael and Belongie, Serge and Hays, James and Perona, Pietro and Ramanan, Deva and others},
+  title     = {Microsoft {COCO}: Common objects in context},
+  booktitle = {Proceedings of the European Conference on Computer Vision},
+  year      = {2014},
+  pages     = {740--755},
+  doi       = {10.1007/978-3-319-10602-1_48}
+}
+
+%% ── TRANSFER LEARNING ────────────────────────────────────────────────────────
+
+@inproceedings{yosinski2014transferable,
+  author    = {Yosinski, Jason and Clune, Jeff and Bengio, Yoshua and Lipson, Hod},
+  title     = {How transferable are features in deep neural networks?},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2014},
+  volume    = {27},
+  pages     = {3320--3328}
+}
+
+@article{sharif2014cnn,
+  author  = {Sharif Razavian, Ali and Azizpour, Hossein and Sullivan, Josephine and Carlsson, Stefan},
+  title   = {{CNN} features off-the-shelf: An astounding baseline for recognition},
+  journal = {arXiv preprint arXiv:1403.6382},
+  year    = {2014}
+}
+
+%% ── EDGE AI & LIGHTWEIGHT MODELS ─────────────────────────────────────────────
+
+@article{nyakuri2025aiandiotpowered,
+  author  = {Nyakuri, Moise and Tuyishimire, Emmanuel and Niyobuhungiro, Japhet},
+  title   = {{AI} and {IoT}-powered real-time plant disease detection using a novel lightweight deep learning model},
+  journal = {Computers and Electronics in Agriculture},
+  year    = {2025},
+  volume  = {228},
+  pages   = {109702},
+  doi     = {10.1016/j.compag.2025.109702}
+}
+
+@article{bhagat2024advancing,
+  author  = {Bhagat, Minakshi and Bhattacharyya, Debnath and Kim, Tai-Hoon},
+  title   = {Advancing plant disease detection: A lightweight deep learning approach for real-time field deployment},
+  journal = {Frontiers in Plant Science},
+  year    = {2024},
+  volume  = {15},
+  pages   = {1401568},
+  doi     = {10.3389/fpls.2024.1401568}
+}
+
+%% ── HYBRID DL-ML PIPELINES ───────────────────────────────────────────────────
+
+@article{sharma2024csxai,
+  author  = {Sharma, Vivek and Tripathi, Arvind Kumar and Mittal, Himanshu},
+  title   = {{CSXAI}: A {CNN-SVM} hybrid with explainable {AI} for crop disease classification},
+  journal = {Ecological Informatics},
+  year    = {2024},
+  volume  = {80},
+  pages   = {102494},
+  doi     = {10.1016/j.ecoinf.2024.102494}
+}
+
+%% ── CITATION PLACEHOLDER FOR PAPER 1 ────────────────────────────────────────
+
+@article{natij2024plant,
+  author  = {Natij, Youssef and El Karch, Hajar and Belaaribi, Abdelmounaim and Lanaya, Oumaima and El Atik, Meriem and Maafiri, Ayyad and Mezouari, Abdelkader},
+  title   = {A resource-efficient framework for plant disease classification: Integrating Reduced-Order Modelling with treatment-based label engineering},
+  journal = {Computers and Electronics in Agriculture},
+  year    = {2024},
+  note    = {Under review}
+}
+
+%% ── RELATED VISION TRANSFORMER WORK ─────────────────────────────────────────
+
+@article{salman2025plantdiseaseclassification,
+  author  = {Salman, Ahmad and Jalal, Ahmad and Kim, Kibum},
+  title   = {Plant disease classification using Vision Transformer with Mixture of Experts},
+  journal = {Computers and Electronics in Agriculture},
+  year    = {2025},
+  volume  = {230},
+  pages   = {109867},
+  doi     = {10.1016/j.compag.2025.109867}
+}
