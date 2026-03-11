@@ -8,6 +8,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{graphicx}
+\graphicspath{{figures/}}
 \usepackage{xurl}
 \usepackage{hyperref}
 \hypersetup{
@@ -103,6 +104,13 @@ This study addresses both gaps. We design and evaluate six preprocessing strateg
     \item We provide \textbf{empirical proof that mIoU and mAP50 rank strategies differently}, demonstrating that evaluating plant disease segmentation models on pixel-level metrics alone conceals critical instance-level failure modes.
 \end{enumerate}
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{fig1_architecture}
+  \caption{System architecture of the proposed preprocessing evaluation framework. Six strategies of increasing annotation cost are compared using YOLOv11m-seg trained for 200 epochs on a single NVIDIA A100 GPU. All strategies are evaluated using complementary pixel-level (mIoU) and instance-level (mAP50) metrics.}
+  \label{fig:architecture}
+\end{figure}
+
 \section{Related Work}
 \label{sec:related_work}
 
@@ -180,7 +188,7 @@ By reporting both metrics, we expose cases where the two diverge --- which we sh
 
 \subsection{Primary Strategy Comparison}
 
-Table~\ref{tab:primary_results} presents the full comparison of all six strategies on the PlantSeg test set. We report mIoU, mAP50, mAP50-95, Precision, and Recall on the 1,146-image test partition.
+Table~\ref{tab:primary_results} and Figure~\ref{fig:strategy_comparison} present the full comparison of all six strategies on the PlantSeg test set. We report mIoU, mAP50, mAP50-95, Precision, and Recall on the 1,146-image test partition.
 
 \begin{table}[h]
 \centering
@@ -202,6 +210,13 @@ baseline & None & 27.93\% & 29.83\% & 17.57\% & 30.2\% & 36.5\% & 1,146 \\
 \end{tabular}%
 }
 \end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{fig2_strategy_comparison}
+  \caption{Side-by-side comparison of all six preprocessing strategies on mIoU (blue) and mAP50 (cyan). Highlighted borders mark the best result per metric: bbox\_guided achieves the highest mIoU (34.12\%) and mask\_guided achieves the highest mAP50 (32.69\%).}
+  \label{fig:strategy_comparison}
+\end{figure}
 
 The annotation-guided strategies (bbox\_guided and mask\_guided) outperform annotation-free approaches on both metrics. Specifically, bbox\_guided leads on mIoU (34.12\%) while mask\_guided leads on mAP50 (32.69\%). The margin between the two is narrow ($<$0.5 pp on both metrics), constituting a dual-winner result where the optimal choice depends on the downstream use case. Both exceed the baseline by $+$6.19 pp on mIoU and the next-best annotation-free strategy (center\_crop) by $+$2.53 pp on mIoU.
 
@@ -236,6 +251,13 @@ Ours --- mask\_guided & YOLOv11m-seg & \textbf{$\sim$20M} & \textbf{$\sim$40G} &
 }
 \end{table}
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{fig4_sota_comparison}
+  \caption{State-of-the-art comparison on PlantSeg. \textbf{Left}: horizontal bar chart of mIoU; the dashed vertical line marks our best result (34.12\%). \textbf{Right}: bubble chart encoding parameter count (bubble area $\propto$ parameters). Our YOLOv11m-seg models use $\sim$20M parameters --- 3$\times$ fewer than SAN ViT-B/16 ($\sim$86M) and 15$\times$ fewer than SAN ViT-L/14 ($\sim$307M) --- while requiring only a single GPU and supporting edge deployment.}
+  \label{fig:sota_comparison}
+\end{figure}
+
 Our bbox\_guided strategy (34.12\% mIoU) surpasses DeepLabv3+ ResNet-101 (27.18\%) by $+$6.94 pp and closely approaches SAN ViT-B/16 (34.79\%) while using approximately 3$\times$ fewer parameters ($\sim$20M vs $\sim$86M) and requiring only single-GPU infrastructure. The gap to SegNeXt (44.52\%) is substantial, but SegNeXt requires 8 GPUs and reports only semantic mIoU; its instance detection capability is unknown.
 
 \subsection{The Four Key Findings}
@@ -246,6 +268,13 @@ bbox\_guided leads mIoU (34.12\%) and mask\_guided leads mAP50 (32.69\%), with a
 \subsubsection{Finding 2: The Context Signal}
 mask\_guided\_aware underperforms mask\_guided despite using identical spatial guidance plus context-suppression augmentation (31.65\% vs 33.72\% mIoU; 31.28\% vs 32.69\% mAP50). The degradation is consistent and reproducible. We interpret this as evidence that the perceptual gradient between healthy and necrotic tissue --- the boundary region suppressed by the augmentation --- constitutes an actively exploited diagnostic feature rather than background noise. The model leverages contrast at the lesion margin to delineate boundaries, and suppressing this signal carries a measurable, reproducible performance cost. This finding has direct implications for augmentation design in plant pathology applications.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{fig5_convergence}
+  \caption{Stylised convergence curves illustrating the context-signal effect. mask\_guided\_aware (dashed amber) rises faster in early epochs due to forced attention on lesion interiors, but converges to a lower asymptote than mask\_guided (solid cyan). The crossover at epoch $\sim$34 indicates that the healthy-to-necrotic boundary --- suppressed by the context-aware augmentation --- constitutes an actively exploited diagnostic signal whose removal carries a reproducible performance cost.}
+  \label{fig:convergence}
+\end{figure}
+
 \subsubsection{Finding 3: The random\_crop Anomaly}
 random\_crop ranks last on mAP50 (27.26\%) but fifth on mIoU (30.22\%), above the baseline on the pixel-level metric while performing worst on instance detection. This 3-rank divergence is the clearest empirical proof that mIoU and mAP50 measure fundamentally different model capabilities. Diverse random crops improve pixel coverage in aggregate --- the model accumulates partial pixel-level signal from many different viewing angles of the disease --- while simultaneously destroying instance-level structure, as lesions are routinely cropped out of frame. A model evaluated solely on mIoU would appear adequate under random\_crop while catastrophically failing at the instance detection task.
 
@@ -254,7 +283,7 @@ bbox\_guided (bounding boxes only) outperforms mask\_guided on mIoU by $+$0.40 p
 
 \subsection{Metric Divergence Analysis}
 
-Table~\ref{tab:rank_divergence} summarizes the ranking of each strategy under both metrics, illustrating the systematic divergence between mIoU and mAP50 rankings.
+Table~\ref{tab:rank_divergence} and Figure~\ref{fig:metric_divergence} summarize the ranking of each strategy under both metrics, illustrating the systematic divergence between mIoU and mAP50 rankings.
 
 \begin{table}[h]
 \centering
@@ -274,6 +303,13 @@ baseline & 6th & 5th & $-1$ & 27.93\% / 29.83\% \\
 \multicolumn{5}{l}{\small random\_crop anomaly: ranks 5th on mIoU but last on mAP50 (3-rank gap).}
 \end{tabular}
 \end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{fig3_metric_divergence}
+  \caption{Metric divergence analysis. \textbf{Left}: scatter plot of mIoU vs mAP50 per strategy; points below the diagonal perform better on mAP50 than mIoU. \textbf{Right}: bump chart showing rank positions under each metric; crossing lines indicate rank swaps. The bold rose line highlights the random\_crop anomaly (5th on mIoU, last on mAP50 --- a 3-rank gap), providing the clearest empirical evidence that the two metrics measure fundamentally different model capabilities.}
+  \label{fig:metric_divergence}
+\end{figure}
 
 Four of the six strategies swap rank between the two metrics. The most striking inversion is random\_crop, which appears reasonable under mIoU (ranking above baseline) while being the worst-performing strategy on instance detection. This has a direct methodological implication: prior PlantSeg benchmarks, which report mIoU exclusively, may have unknowingly favored strategies that perform well on pixel coverage while failing on instance-level tasks.
 
