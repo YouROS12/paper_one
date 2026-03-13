@@ -75,7 +75,7 @@
                 country={Morocco}}
 
 \begin{abstract}
-We present an intelligent preprocessing framework for plant disease instance segmentation on PlantSeg --- the largest in-the-wild plant disease segmentation dataset, comprising 11,458 images across 115 disease categories and 34 host plant species. Using a single NVIDIA A100 GPU with approximately 9 hours of training per strategy, we evaluate six preprocessing approaches ranging from annotation-free baselines to expert polygon-guided strategies. Our \textbf{bounding-box-guided preprocessing achieves 34.12\% mIoU}, surpassing DeepLabv3+ ResNet-101 (27.18\%) and approaching SAN ViT-B/16 (34.79\%) --- while requiring 3$\times$ fewer parameters, no multi-GPU infrastructure, and remaining fully deployable on edge devices. We further demonstrate that \textbf{context-aware mask augmentation improves early convergence but degrades final performance}, revealing that the perceptual gradient between healthy and necrotic tissue constitutes a diagnostically irreplaceable feature signal. Finally, we show empirically that \textbf{instance-level metrics (mAP50) expose failure modes invisible to pixel-level metrics (mIoU)} --- a methodological contribution to how plant disease segmentation models should be evaluated. Our results establish the first instance segmentation baseline on PlantSeg and demonstrate that disease-aware spatial preprocessing, achievable with low-cost bounding box annotations, closes the gap to significantly more expensive prior approaches.
+We present an intelligent preprocessing framework for plant disease instance segmentation on PlantSeg \citep{plantseg2024} --- the largest in-the-wild plant disease segmentation dataset, comprising 11,458 images across 115 disease categories and 34 host plant species. Using a single NVIDIA A100 GPU with approximately 11.5 hours of training per strategy, we evaluate six preprocessing approaches ranging from annotation-free baselines to expert polygon-guided strategies. Our \textbf{bounding-box-guided preprocessing achieves 34.12\% mIoU}, surpassing DeepLabv3+ ResNet-101 (27.18\%) and approaching SAN ViT-B/16 (34.79\%) --- while requiring $\sim$4$\times$ fewer parameters, no multi-GPU infrastructure, and remaining fully deployable on edge devices. We further demonstrate that \textbf{context-aware mask augmentation consistently degrades final performance}, revealing that the perceptual gradient between healthy and necrotic tissue constitutes a diagnostically irreplaceable feature signal. Finally, we show empirically that \textbf{instance-level metrics (mAP50) expose failure modes invisible to pixel-level metrics (mIoU)} --- a methodological contribution to how plant disease segmentation models should be evaluated. Our results establish the first instance segmentation baseline on PlantSeg and demonstrate that disease-aware spatial preprocessing, achievable with low-cost bounding box annotations, closes the gap to significantly more expensive prior approaches.
 \end{abstract}
 
 \begin{keyword}
@@ -89,18 +89,18 @@ Plant Disease Segmentation \sep Instance Segmentation \sep YOLOv11 \sep Preproce
 
 Automated plant disease detection is a cornerstone challenge in precision agriculture, with significant implications for global food security \citep{tilman2011global, fao2021impact}. Annual crop losses attributed to plant diseases exceed \$220 billion worldwide \citep{savary2019global, strange2005plant}. While classification-based approaches have matured considerably over the past decade \citep{mohanty2016using, ferentinos2018deep, kamilaris2018deep}, the field increasingly demands spatially precise outputs: not merely \emph{what} disease is present, but \emph{where} on the plant tissue it manifests and \emph{how much} area it occupies. Instance segmentation, which requires simultaneous detection, localization, and pixel-level delineation of every individual lesion, directly addresses this need.
 
-The transition from classification to instance segmentation introduces new challenges beyond those of recognition alone. Standard segmentation benchmarks have relied on semantic metrics (most commonly mean Intersection over Union, mIoU), which aggregate pixel-level correctness across classes but do not penalize missed instances \citep{garcia2017review}. In contrast, instance-level metrics such as mAP50 require every individual lesion to be simultaneously detected, localized, and classified above an IoU threshold, imposing a far stricter evaluation criterion. This distinction has profound methodological consequences: a model may appear adequate under mIoU while catastrophically failing to detect individual disease instances, a gap that has not been examined in the plant disease segmentation literature.
+The transition from classification to instance segmentation introduces new challenges beyond those of recognition alone. Standard segmentation benchmarks have relied on semantic metrics (most commonly mean Intersection over Union, mIoU), which aggregate pixel-level correctness across classes but do not penalize missed instances \citep{garcia2017review}. In contrast, instance-level metrics such as mAP50 require every individual lesion to be simultaneously detected, localized, and classified above an IoU threshold, imposing a far stricter evaluation criterion. This distinction has profound methodological consequences: a model may appear adequate under mIoU while catastrophically failing to detect individual disease instances --- a gap that has not been examined in the plant disease segmentation literature \citep{rethink2021segeval}.
 
 A further bottleneck concerns preprocessing and annotation cost. Expert polygon annotation of lesion boundaries is expensive and time-consuming. Practically motivated alternatives, such as using bounding box annotations or annotation-free spatial cropping heuristics, could dramatically lower deployment barriers --- but their comparative value has not been rigorously quantified on a challenging in-the-wild benchmark.
 
-PlantSeg \citep{plantseg2023} addresses the realism gap by providing 11,458 in-the-wild images across 115 disease categories and 34 host plants, together with expert-annotated polygon masks and derived bounding box annotations. However, all prior work on PlantSeg has relied on semantic segmentation and reported only mIoU, leaving instance segmentation and mAP50 evaluation unexplored.
+PlantSeg \citep{plantseg2024} addresses the realism gap by providing 11,458 in-the-wild images across 115 disease categories and 34 host plants, together with expert-annotated polygon masks and derived bounding box annotations. However, all prior work on PlantSeg has relied on semantic segmentation and reported only mIoU, leaving instance segmentation and mAP50 evaluation unexplored.
 
 This study addresses both gaps. We design and evaluate six preprocessing strategies of increasing annotation cost on YOLOv11m-seg \citep{yolov11_2024}, a modern instance segmentation architecture, and evaluate all strategies on both mIoU and mAP50. Our central contributions are:
 
 \begin{enumerate}
     \item We establish the \textbf{first instance segmentation baseline} on PlantSeg, evaluated on both mIoU and mAP50.
-    \item We demonstrate that \textbf{bounding-box-guided preprocessing} achieves leading mIoU (34.12\%), surpassing prior semantic baselines and approaching large transformer-based models at 3$\times$ lower parameter count.
-    \item We reveal that the \textbf{healthy-to-necrotic tissue boundary is a diagnostically active feature signal}: suppressing it via context-aware augmentation degrades final performance despite improving early convergence.
+    \item We demonstrate that \textbf{bounding-box-guided preprocessing} achieves leading mIoU (34.12\%), surpassing prior semantic baselines and approaching large transformer-based models at $\sim$4$\times$ lower parameter count.
+    \item We reveal that the \textbf{healthy-to-necrotic tissue boundary is a diagnostically active feature signal}: suppressing it via context-aware augmentation degrades both mIoU and mAP50 compared to mask-guided preprocessing without augmentation.
     \item We provide \textbf{empirical proof that mIoU and mAP50 rank strategies differently}, demonstrating that evaluating plant disease segmentation models on pixel-level metrics alone conceals critical instance-level failure modes.
 \end{enumerate}
 
@@ -115,23 +115,23 @@ This study addresses both gaps. We design and evaluate six preprocessing strateg
 \label{sec:related_work}
 
 \subsection{Deep Learning for Plant Disease Recognition}
-Convolutional neural networks have become the dominant paradigm for image-based plant disease diagnosis \citep{lu2021reviewonconvolutional, liu2021plantdiseasesand}. Seminal works by \citet{mohanty2016using} and \citet{ferentinos2018deep} demonstrated high accuracy on the PlantVillage laboratory dataset \citep{hughes2015open}, while subsequent studies exposed the gap between controlled and field performance \citep{barbedo2016review, barbedo2019plant, noyan2022uncovering}. Object detection architectures have been adapted for agricultural tasks, with YOLO-family models emerging as particularly effective due to their balance of speed and accuracy \citep{pan2023xooyoloadetection, li2022plant}. Recent work has extended this trend to instance segmentation, but large-scale in-the-wild benchmarks remain underexplored.
+Convolutional neural networks have become the dominant paradigm for image-based plant disease diagnosis \citep{lu2021reviewonconvolutional, liu2021plantdiseasesand}. Seminal works by \citet{mohanty2016using} and \citet{ferentinos2018deep} demonstrated high accuracy on the PlantVillage laboratory dataset \citep{hughes2015open}, while subsequent studies exposed the gap between controlled and field performance \citep{barbedo2016review, barbedo2019plant, noyan2022uncovering}. Object detection architectures have been adapted for agricultural tasks, with YOLO-family models emerging as particularly effective due to their balance of speed and accuracy \citep{pan2023xooyoloadetection, rana2025yolo, miao2025serpensgate}. The recent YOLOv11 series \citep{yolov11_2024} introduced the C3K2 block and C2PSA attention mechanism, improving small-object detection performance relevant to early-stage lesion identification. Lightweight adaptations for field-deployed edge devices have also attracted growing interest \citep{nyakuri2025aiandiotpowered, bhagat2024advancing}. Recent work has extended this trend to instance segmentation, but large-scale in-the-wild benchmarks remain underexplored.
 
 \subsection{Instance Segmentation Architectures}
-Modern instance segmentation builds on detection-centric architectures. Mask R-CNN \citep{he2017mask} introduced a canonical two-stage framework coupling region proposal with mask prediction. Single-stage alternatives such as SOLO \citep{wang2020solo}, CondInst \citep{tian2020conditional}, and YOLACT \citep{bolya2019yolact} trade accuracy for speed, with YOLO-family models progressively integrating segmentation heads \citep{redmon2016you, jocher2023ultralytics, yolov11_2024}. Transformer-based methods, including the Slice Attention Network (SAN) \citep{xu2023side}, have achieved strong semantic segmentation performance but require substantially higher computational budgets. On the PlantSeg benchmark, \citet{plantseg2023} evaluated DeepLabv3 and DeepLabv3+ variants alongside SAN and SegNeXt \citep{guo2022segnext}, reporting semantic mIoU up to 44.52\% with SegNeXt on 8 GPUs. No prior work has applied instance segmentation models or reported mAP50 on this benchmark.
+Modern instance segmentation builds on detection-centric architectures. Mask R-CNN \citep{he2017mask} introduced a canonical two-stage framework coupling region proposal with mask prediction. Single-stage alternatives such as SOLO \citep{wang2020solo}, CondInst \citep{tian2020conditional}, and YOLACT \citep{bolya2019yolact} trade accuracy for speed, with YOLO-family models progressively integrating segmentation heads \citep{redmon2016you, jocher2023ultralytics, yolov11_2024}. Transformer-based methods, including the Slice Attention Network (SAN) \citep{xu2023side}, have achieved strong semantic segmentation performance but require substantially higher computational budgets. On the PlantSeg benchmark, \citet{plantseg2024} evaluated DeepLabv3 and DeepLabv3+ variants alongside SAN and SegNeXt \citep{guo2022segnext}, reporting semantic mIoU up to 44.52\% with SegNeXt. No prior work has applied instance segmentation models or reported mAP50 on this benchmark.
 
 \subsection{Preprocessing and Data Augmentation in Agricultural Vision}
-Preprocessing and augmentation strategies are critical in low-data regimes common to agricultural AI. Standard spatial augmentations (random flipping, random cropping) have well-documented effects on object detection models \citep{zoph2020learning, cubuk2020randaugment}, but their interaction with disease-specific spatial signals has not been studied systematically. Disease symptoms are spatially localized --- lesions occupy a small, non-uniform portion of the image --- suggesting that annotation-guided cropping may offer advantages over random approaches. \citet{wu2023fromlaboratoryto} explored domain-aware augmentation for lab-to-field transfer, and \citet{xu2023embracinglimitedand} examined data efficiency under annotation constraints. Several works have used bounding box annotations as a proxy for polygon masks \citep{fan2020inf, khoreva2017simple}, motivating the weak supervision setting explored in this paper. Context retention has also been identified as important in medical image segmentation \citep{chen2021transunet}, suggesting that preserving the boundary between healthy and diseased tissue may be beneficial for the model.
+Preprocessing and augmentation strategies are critical in low-data regimes common to agricultural AI. Standard spatial augmentations (random flipping, random cropping) have well-documented effects on object detection models \citep{zoph2020learning, cubuk2020randaugment}, but their interaction with disease-specific spatial signals has not been studied systematically. Disease symptoms are spatially localized --- lesions occupy a small, non-uniform portion of the image --- suggesting that annotation-guided cropping may offer advantages over random approaches. \citet{wu2023fromlaboratoryto} explored domain-aware augmentation for lab-to-field transfer, and \citet{xu2023embracinglimitedand} examined data efficiency under annotation constraints. Several works have used bounding box annotations as a proxy for polygon masks \citep{fan2020inf, khoreva2017simple}, motivating the weak supervision setting explored in this paper. Context retention has also been identified as important in medical image segmentation \citep{chen2021transunet}, suggesting that preserving the boundary between healthy and diseased tissue may be beneficial. Disease severity estimation --- quantifying the proportion of plant area affected --- similarly benefits from spatially precise segmentation under natural field conditions.
 
 \subsection{Evaluation Metrics for Segmentation}
-The divergence between semantic and instance metrics is well recognized in general computer vision \citep{garcia2017review, cordts2016cityscapes} but has not been examined in plant disease segmentation. mIoU measures pixel-level class agreement averaged over classes; classes absent from both prediction and ground truth are excluded, making the metric forgiving toward missed detections. mAP50, by contrast, requires each individual instance to be predicted with IoU $\geq$ 0.50 against a ground truth annotation; missed instances directly reduce recall and thus AP. This fundamental difference motivates our dual-metric evaluation protocol.
+The divergence between semantic and instance metrics is well recognized in general computer vision \citep{garcia2017review, cordts2016cityscapes} but has not been examined in plant disease segmentation. mIoU measures pixel-level class agreement averaged over classes; classes absent from both prediction and ground truth are excluded, making the metric forgiving toward missed detections \citep{rethink2021segeval}. mAP50, by contrast, requires each individual instance to be predicted with IoU $\geq$ 0.50 against a ground truth annotation; missed instances directly reduce recall and thus AP. This fundamental difference motivates our dual-metric evaluation protocol.
 
 \section{Methodology}
 \label{sec:methodology}
 
 \subsection{Dataset}
 
-We conduct all experiments on PlantSeg \citep{plantseg2023}, the largest in-the-wild plant disease segmentation dataset currently available. It comprises 11,458 images covering 115 disease categories across 34 host plant species, with a mean of approximately 104 images per class. The dataset was collected under natural field conditions, featuring complex backgrounds, variable lighting, partial occlusions, and significant morphological variation between and within classes. Both expert-annotated polygon masks and derived bounding box annotations are provided. The dataset is partitioned into a 70/10/20 train/validation/test split, which we use without modification.
+We conduct all experiments on PlantSeg \citep{plantseg2024}, the largest in-the-wild plant disease segmentation dataset currently available. It comprises 11,458 images covering 115 disease categories across 34 host plant species, with a mean of approximately 104 images per class. The dataset was collected under natural field conditions, featuring complex backgrounds, variable lighting, partial occlusions, and significant morphological variation between and within classes. Both expert-annotated polygon masks and derived bounding box annotations are provided. The dataset is partitioned into a 70/10/20 train/validation/test split, which we use without modification.
 
 In contrast to commonly used benchmarks, PlantSeg is explicitly designed to resist background bias. PlantVillage \citep{hughes2015open} (38 classes, lab conditions) and PlantDoc \citep{singh2020plantdoc} (27 classes) are captured in controlled settings, making them substantially less representative of practical deployment conditions. PlantSeg's in-the-wild nature, combined with its scale and annotation richness, makes it the appropriate choice for studying preprocessing strategies under realistic complexity.
 
@@ -152,20 +152,22 @@ Test & 1,146 & 115 & 34 & $\sim$10 \\
 \end{tabular}
 \end{table}
 
-\subsection{Model Architecture}
+\subsection{Model Architecture and Training Configuration}
 
-We use YOLOv11m-seg \citep{yolov11_2024}, a medium-scale instance segmentation model from the YOLO family with approximately 20M parameters and 40 GFLOPs. The model combines a detection head for bounding box prediction with a segmentation head that generates instance masks via prototype decomposition, enabling single-stage instance segmentation at inference speeds compatible with edge deployment. All models were pretrained on COCO \citep{lin2014microsoft} and fine-tuned on PlantSeg for 200 epochs on a single NVIDIA A100 40GB GPU, requiring approximately 9 hours per strategy. We do not alter the architecture between strategies; all differences stem exclusively from preprocessing.
+We use YOLOv11m-seg \citep{yolov11_2024}, a medium-scale instance segmentation model from the YOLO family with approximately 20M parameters and 40 GFLOPs. The model combines a detection head for bounding box prediction with a segmentation head that generates instance masks via prototype decomposition, enabling single-stage instance segmentation at inference speeds compatible with edge deployment. All models were pretrained on COCO \citep{lin2014microsoft} and fine-tuned on PlantSeg for 200 epochs on a single NVIDIA A100 40GB GPU, requiring approximately 11.5 hours per strategy (confirmed from training logs; $\sim$41,400--42,400 seconds). We do not alter the architecture between strategies; all differences stem exclusively from preprocessing.
+
+Shared training hyperparameters for all strategies: input resolution 640$\times$640; batch size 64; initial learning rate 0.01 with cosine decay to 0.01; momentum 0.937; weight decay $5\times10^{-4}$; patience 25 (early stopping). Built-in augmentations shared across all strategies: horizontal flip, HSV jitter (H: 0.015, S: 0.7, V: 0.4), mosaic probability 1.0, mixup 0.1, scale jitter 0.5.
 
 \subsection{Preprocessing Strategies}
 \label{sec:strategies}
 
 We designed six preprocessing strategies to systematically test the effect of annotation type, spatial guidance, and context on segmentation performance. The strategies form a spectrum from annotation-free spatial heuristics to expert polygon-guided approaches.
 
-\textbf{Baseline.} Standard YOLO preprocessing with no spatial modification: images are letter-boxed to the target resolution with default augmentations (horizontal flip, scale jitter). This serves as the control condition.
+\textbf{Baseline.} Standard YOLO preprocessing with no spatial modification: images are letter-boxed to the target resolution with default augmentations. This serves as the control condition.
 
-\textbf{Random Crop.} A naive augmentation approach in which a random sub-region of the image is cropped before resizing. This increases data diversity but makes no use of disease location information, frequently cropping away the lesion of interest. This strategy tests whether generic augmentation is beneficial or harmful in the presence of spatially localized disease features.
+\textbf{Random Crop.} A naive augmentation approach in which a random sub-region of the image is cropped before resizing. This increases data diversity but makes no use of disease location information, frequently cropping away the lesion of interest. Images from which all annotated instances fall entirely outside the crop region are excluded from evaluation, resulting in a reduced test partition (N\,=\,1,119).
 
-\textbf{Center Crop.} A fixed central crop is extracted from each image before resizing. This reduces background area but assumes that disease features are centrally located, which is not generally true for in-the-wild imagery. It serves as an intermediate condition between the fully random and annotation-guided strategies.
+\textbf{Center Crop.} A fixed central crop is extracted from each image before resizing. This reduces background area but assumes that disease features are centrally located, which is not generally true for in-the-wild imagery. Center crops also result in some annotation-empty images being excluded (N\,=\,1,135).
 
 \textbf{Bounding Box-Guided (bbox\_guided).} We use the provided bounding box annotations to compute a disease-aware crop region. The crop is centered on the bounding box centroid and extended by a fixed context margin to retain surrounding tissue. This strategy requires only bounding box labels --- substantially cheaper to annotate than polygon masks --- but provides spatially informed preprocessing.
 
@@ -179,7 +181,7 @@ We evaluate all strategies using two complementary metrics:
 
 \textbf{mIoU (mean Intersection over Union).} Semantic segmentation metric computed by converting instance prediction masks to semantic label maps via class-union projection, then computing per-class IoU averaged over classes present in the test set. Classes absent from both prediction and ground truth are excluded from the average.
 
-\textbf{mAP50 (mean Average Precision at IoU 0.50).} Instance segmentation metric that requires each predicted instance to achieve IoU $\geq$ 0.50 with a ground truth annotation. Precision and recall are computed per class across confidence thresholds; mAP50 is the mean AP across all 115 classes. Unlike mIoU, every missed instance directly penalizes recall.
+\textbf{mAP50 (mean Average Precision at IoU 0.50).} Instance-level metric based on bounding box predictions. Each predicted box must achieve IoU $\geq$ 0.50 with a ground truth annotation. Precision and recall are computed per class across confidence thresholds; mAP50 is the mean AP across all 115 classes. Unlike mIoU, every missed instance directly penalizes recall. We additionally report mAP50-95 (averaged over IoU thresholds 0.50--0.95 in 0.05 increments) as a stricter secondary measure.
 
 By reporting both metrics, we expose cases where the two diverge --- which we show is both common and methodologically significant.
 
@@ -188,25 +190,24 @@ By reporting both metrics, we expose cases where the two diverge --- which we sh
 
 \subsection{Primary Strategy Comparison}
 
-Table~\ref{tab:primary_results} and Figure~\ref{fig:strategy_comparison} present the full comparison of all six strategies on the PlantSeg test set. We report mIoU, mAP50, mAP50-95, Precision, and Recall on the 1,146-image test partition.
+Table~\ref{tab:primary_results} and Figure~\ref{fig:strategy_comparison} present the full comparison of all six strategies on the PlantSeg test set.
 
 \begin{table}[h]
 \centering
-\caption{Test set performance of six preprocessing strategies on PlantSeg. YOLOv11m-seg, 200 epochs, single A100 40GB, single seed.}
+\caption{Test set performance of six preprocessing strategies on PlantSeg. YOLOv11m-seg, 200 epochs, single A100 40GB. mAP50 and Precision/Recall are bounding box metrics. mIoU is computed via class-union projection from instance predictions. N\,Test varies for random\_crop and center\_crop because images where all instances fall outside the crop region are excluded from evaluation.}
 \label{tab:primary_results}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llcccccr}
 \toprule
 \textbf{Strategy} & \textbf{Annotation} & \textbf{mIoU $\uparrow$} & \textbf{mAP50 $\uparrow$} & \textbf{mAP50-95 $\uparrow$} & \textbf{Precision} & \textbf{Recall} & \textbf{N Test} \\
 \midrule
-mask\_guided & Polygon mask & 33.72\% & \textbf{32.69\%} & 19.95\% & 36.6\% & 36.7\% & 1,146 \\
-\textbf{bbox\_guided} & Bounding box & \textbf{34.12\%} & 32.25\% & 18.84\% & \textbf{38.7\%} & 35.1\% & 1,146 \\
-mask\_guided\_aware & Polygon + aug. & 31.65\% & 31.28\% & 19.22\% & 37.9\% & 36.2\% & 1,146 \\
-center\_crop & None & 31.59\% & 30.48\% & 18.03\% & 36.1\% & 35.5\% & 1,135 \\
-random\_crop & None & 30.22\% & 27.26\% & 16.87\% & 32.7\% & 33.7\% & 1,119 \\
+mask\_guided & Polygon mask & 33.72\% & \textbf{32.69\%} & 19.95\% & 35.0\% & 36.7\% & 1,146 \\
+\textbf{bbox\_guided} & Bounding box & \textbf{34.12\%} & 32.25\% & 20.12\% & 32.8\% & \textbf{40.1\%} & 1,146 \\
+mask\_guided\_aware & Polygon + aug. & 31.65\% & 31.28\% & 19.22\% & \textbf{38.0\%} & 36.2\% & 1,146 \\
+center\_crop & None & 31.59\% & 30.48\% & 19.08\% & 35.1\% & 36.6\% & 1,135 \\
 baseline & None & 27.93\% & 29.83\% & 17.57\% & 30.2\% & 36.5\% & 1,146 \\
+random\_crop & None & 30.22\% & 28.96\% & 17.62\% & 31.5\% & 37.1\% & 1,119 \\
 \bottomrule
-\multicolumn{8}{l}{\small mIoU computed via class-union projection. Single seed --- multi-seed validation pending (seeds 123, 456).}
 \end{tabular}%
 }
 \end{table}
@@ -222,27 +223,27 @@ The annotation-guided strategies (bbox\_guided and mask\_guided) outperform anno
 
 \subsection{Comparison with Prior Semantic Segmentation Baselines}
 
-Table~\ref{tab:sota_comparison} places our results in the context of prior PlantSeg benchmarks. All prior work relied on semantic segmentation and multi-GPU infrastructure; we compare only on mIoU, as no prior work reports mAP50 on this dataset.
+Table~\ref{tab:sota_comparison} places our results in the context of prior PlantSeg benchmarks \citep{plantseg2024}. All prior PlantSeg work employed semantic segmentation models and reported only mIoU; a direct numerical comparison on this single metric is provided for context, with the important caveat that prior methods address a different task (semantic segmentation) and cannot detect individual instances. Our model performs instance segmentation, which is a strictly harder task.
 
 \begin{table}[h]
 \centering
-\caption{Comparison with prior PlantSeg benchmarks. Training hardware and time were not reported by PlantSeg authors and are omitted. $\dagger$ = estimated from architecture papers.}
+\caption{Comparison with prior PlantSeg benchmarks \citep{plantseg2024}. Training hardware and time were not reported by PlantSeg authors and are omitted to avoid unverified claims. $\dagger$ = parameter and GFLOP estimates from the original architecture papers, not from PlantSeg training logs. \textit{Note}: prior methods perform semantic segmentation; mIoU comparison is provided as context only, as tasks differ.}
 \label{tab:sota_comparison}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llcccccc}
 \toprule
 \textbf{Method} & \textbf{Backbone} & \textbf{Params} & \textbf{GFLOPs} & \textbf{Multi-GPU} & \textbf{Edge} & \textbf{mIoU} & \textbf{mAP50} \\
 \midrule
-\multicolumn{8}{l}{\textit{Prior Work --- Semantic Segmentation (PlantSeg Paper \citep{plantseg2023})}} \\
+\multicolumn{8}{l}{\textit{Prior Work --- Semantic Segmentation \citep{plantseg2024}}} \\
 DeepLabv3 \citep{chen2017deeplab} & ResNet-50 & $\sim$40M$\dagger$ & $\sim$65G$\dagger$ & — & No & 17.24\% & — \\
 DeepLabv3 \citep{chen2017deeplab} & ResNet-101 & $\sim$59M$\dagger$ & $\sim$85G$\dagger$ & — & No & 20.72\% & — \\
 DeepLabv3+ \citep{chen2018encoder} & ResNet-50 & $\sim$43M$\dagger$ & $\sim$67G$\dagger$ & — & No & 25.08\% & — \\
 DeepLabv3+ \citep{chen2018encoder} & ResNet-101 & $\sim$62M$\dagger$ & $\sim$88G$\dagger$ & — & No & 27.18\% & — \\
 SAN \citep{xu2023side} & ViT-B/16 & $\sim$86M$\dagger$ & $\sim$195G$\dagger$ & — & No & 34.79\% & — \\
 SAN \citep{xu2023side} & ViT-L/14 & $\sim$307M$\dagger$ & $\sim$810G$\dagger$ & — & No & 36.91\% & — \\
-SegNeXt \citep{guo2022segnext} & MSCAN-L & 49M & 70G & Yes (8 GPUs) & No & \textbf{44.52\%} & — \\
+SegNeXt \citep{guo2022segnext} & MSCAN-L & 49M & 70G & Yes & No & \textbf{44.52\%} & — \\
 \midrule
-\multicolumn{8}{l}{\textit{This Work --- Instance Segmentation, Single A100, $\sim$9h / strategy}} \\
+\multicolumn{8}{l}{\textit{This Work --- Instance Segmentation, Single A100, $\sim$11.5h / strategy}} \\
 Ours --- baseline & YOLOv11m-seg & \textbf{$\sim$20M} & \textbf{$\sim$40G} & No & Yes & 27.93\% & 29.83\% \\
 \textbf{Ours --- bbox\_guided} & YOLOv11m-seg & \textbf{$\sim$20M} & \textbf{$\sim$40G} & No & Yes & \textbf{34.12\%} & 32.25\% \\
 Ours --- mask\_guided & YOLOv11m-seg & \textbf{$\sim$20M} & \textbf{$\sim$40G} & No & Yes & 33.72\% & \textbf{32.69\%} \\
@@ -254,11 +255,11 @@ Ours --- mask\_guided & YOLOv11m-seg & \textbf{$\sim$20M} & \textbf{$\sim$40G} &
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{fig4_sota_comparison}
-  \caption{State-of-the-art comparison on PlantSeg. \textbf{Left}: horizontal bar chart of mIoU; the dashed vertical line marks our best result (34.12\%). \textbf{Right}: bubble chart encoding parameter count (bubble area $\propto$ parameters). Our YOLOv11m-seg models use $\sim$20M parameters --- 3$\times$ fewer than SAN ViT-B/16 ($\sim$86M) and 15$\times$ fewer than SAN ViT-L/14 ($\sim$307M) --- while requiring only a single GPU and supporting edge deployment.}
+  \caption{Comparison with prior PlantSeg benchmarks on mIoU. \textbf{Left}: horizontal bar chart of mIoU; the dashed vertical line marks our best result (34.12\%). \textbf{Right}: bubble chart encoding parameter count (bubble area $\propto$ parameters). Our YOLOv11m-seg models use $\sim$20M parameters --- $\sim$4$\times$ fewer than SAN ViT-B/16 ($\sim$86M) and $\sim$15$\times$ fewer than SAN ViT-L/14 ($\sim$307M) --- while requiring only a single GPU and supporting edge deployment. Note that prior methods perform semantic segmentation; this comparison is provided as context.}
   \label{fig:sota_comparison}
 \end{figure}
 
-Our bbox\_guided strategy (34.12\% mIoU) surpasses DeepLabv3+ ResNet-101 (27.18\%) by $+$6.94 pp and closely approaches SAN ViT-B/16 (34.79\%) while using approximately 3$\times$ fewer parameters ($\sim$20M vs $\sim$86M) and requiring only single-GPU infrastructure. The gap to SegNeXt (44.52\%) is substantial, but SegNeXt requires 8 GPUs and reports only semantic mIoU; its instance detection capability is unknown.
+Our bbox\_guided strategy (34.12\% mIoU) surpasses DeepLabv3+ ResNet-101 (27.18\%) by $+$6.94 pp and closely approaches SAN ViT-B/16 (34.79\%) while using approximately $\sim$4$\times$ fewer parameters ($\sim$20M vs $\sim$86M) and requiring only single-GPU infrastructure. The gap to SegNeXt (44.52\%) is substantial, but SegNeXt performs semantic segmentation and its instance detection capability is unknown. These cross-task comparisons should be interpreted with the understanding that instance segmentation is a strictly harder problem than semantic segmentation.
 
 \subsection{The Four Key Findings}
 
@@ -266,20 +267,20 @@ Our bbox\_guided strategy (34.12\% mIoU) surpasses DeepLabv3+ ResNet-101 (27.18\
 bbox\_guided leads mIoU (34.12\%) and mask\_guided leads mAP50 (32.69\%), with a margin under 0.5 pp on both. This constitutes a dual-winner result: bbox\_guided is preferable for pixel-level disease area quantification tasks (e.g., canopy-level disease severity estimation), while mask\_guided is preferable for instance-level detection tasks (e.g., counting individual lesions). This distinction provides practitioners with a principled basis for annotation investment decisions.
 
 \subsubsection{Finding 2: The Context Signal}
-mask\_guided\_aware underperforms mask\_guided despite using identical spatial guidance plus context-suppression augmentation (31.65\% vs 33.72\% mIoU; 31.28\% vs 32.69\% mAP50). The degradation is consistent and reproducible. We interpret this as evidence that the perceptual gradient between healthy and necrotic tissue --- the boundary region suppressed by the augmentation --- constitutes an actively exploited diagnostic feature rather than background noise. The model leverages contrast at the lesion margin to delineate boundaries, and suppressing this signal carries a measurable, reproducible performance cost. This finding has direct implications for augmentation design in plant pathology applications.
+mask\_guided\_aware underperforms mask\_guided despite using identical spatial guidance plus context-suppression augmentation (31.65\% vs 33.72\% mIoU; 31.28\% vs 32.69\% mAP50). The degradation is consistent across both metrics. We interpret this as evidence that the perceptual gradient between healthy and necrotic tissue --- the boundary region suppressed by the augmentation --- constitutes an actively exploited diagnostic feature rather than background noise. The model leverages contrast at the lesion margin to delineate boundaries, and suppressing this signal carries a measurable performance cost. This finding has direct implications for augmentation design in plant pathology applications.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.9\textwidth]{fig5_convergence}
-  \caption{Stylised convergence curves illustrating the context-signal effect. mask\_guided\_aware (dashed amber) rises faster in early epochs due to forced attention on lesion interiors, but converges to a lower asymptote than mask\_guided (solid cyan). The crossover at epoch $\sim$34 indicates that the healthy-to-necrotic boundary --- suppressed by the context-aware augmentation --- constitutes an actively exploited diagnostic signal whose removal carries a reproducible performance cost.}
+  \caption{Validation mAP50 curves across 200 training epochs for five preprocessing strategies (real data from training logs). Annotation-guided strategies (bbox\_guided, mask\_guided) converge to higher performance levels than annotation-free approaches (baseline, center\_crop, random\_crop), reflecting the consistent advantage of spatially informed preprocessing throughout training. Data for mask\_guided\_aware was unavailable; final test set performance is reported in Table~\ref{tab:primary_results}.}
   \label{fig:convergence}
 \end{figure}
 
 \subsubsection{Finding 3: The random\_crop Anomaly}
-random\_crop ranks last on mAP50 (27.26\%) but fifth on mIoU (30.22\%), above the baseline on the pixel-level metric while performing worst on instance detection. This 3-rank divergence is the clearest empirical proof that mIoU and mAP50 measure fundamentally different model capabilities. Diverse random crops improve pixel coverage in aggregate --- the model accumulates partial pixel-level signal from many different viewing angles of the disease --- while simultaneously destroying instance-level structure, as lesions are routinely cropped out of frame. A model evaluated solely on mIoU would appear adequate under random\_crop while catastrophically failing at the instance detection task.
+random\_crop ranks last on mAP50 (28.96\%) but fifth on mIoU (30.22\%), above the baseline on the pixel-level metric while performing worst on instance detection. This divergence is the clearest empirical proof that mIoU and mAP50 measure fundamentally different model capabilities. Diverse random crops improve pixel coverage in aggregate --- the model accumulates partial pixel-level signal from many different viewing angles of the disease --- while simultaneously destroying instance-level structure, as lesions are routinely cropped out of frame. A model evaluated solely on mIoU would appear adequate under random\_crop while catastrophically failing at the instance detection task.
 
 \subsubsection{Finding 4: Annotation Efficiency}
-bbox\_guided (bounding boxes only) outperforms mask\_guided on mIoU by $+$0.40 pp while losing mAP50 by only $-$0.44 pp. Given that bounding box annotation is substantially cheaper than expert polygon annotation in terms of both time and required expertise, this result challenges the assumption that pixel-level polygon labels are necessary for high-quality preprocessing. For applications where mIoU is the primary evaluation criterion, expensive polygon annotation is not justified.
+bbox\_guided (bounding boxes only) outperforms mask\_guided on mIoU by $+$0.40 pp while losing mAP50 by only $-$0.44 pp. Given that bounding box annotation is substantially cheaper than expert polygon annotation in terms of both time and required expertise \citep{khoreva2017simple}, this result challenges the assumption that pixel-level polygon labels are necessary for high-quality preprocessing. For applications where mIoU is the primary evaluation criterion, expensive polygon annotation is not justified.
 
 \subsection{Metric Divergence Analysis}
 
@@ -287,7 +288,7 @@ Table~\ref{tab:rank_divergence} and Figure~\ref{fig:metric_divergence} summarize
 
 \begin{table}[h]
 \centering
-\caption{Ranking divergence across preprocessing strategies. The 3-rank gap for random\_crop is the key evidence for metric divergence.}
+\caption{Ranking divergence across preprocessing strategies. The random\_crop anomaly (5th on mIoU, last on mAP50) is the key evidence for metric divergence.}
 \label{tab:rank_divergence}
 \begin{tabular}{lrrrr}
 \toprule
@@ -295,54 +296,54 @@ Table~\ref{tab:rank_divergence} and Figure~\ref{fig:metric_divergence} summarize
 \midrule
 bbox\_guided & 1st & 2nd & $+1$ & 34.12\% / 32.25\% \\
 mask\_guided & 2nd & 1st & $-1$ & 33.72\% / 32.69\% \\
-mask\_guided\_aware & 4th & 3rd & $-1$ & 31.65\% / 31.28\% \\
-center\_crop & 3rd & 4th & $+1$ & 31.59\% / 30.48\% \\
-random\_crop & 5th & 6th & $+1$ & 30.22\% / 27.26\% \\
+mask\_guided\_aware & 3rd & 3rd & 0 & 31.65\% / 31.28\% \\
+center\_crop & 4th & 4th & 0 & 31.59\% / 30.48\% \\
+random\_crop & 5th & 6th & $+1$ & 30.22\% / 28.96\% \\
 baseline & 6th & 5th & $-1$ & 27.93\% / 29.83\% \\
 \bottomrule
-\multicolumn{5}{l}{\small random\_crop anomaly: ranks 5th on mIoU but last on mAP50 (3-rank gap).}
+\multicolumn{5}{l}{\small random\_crop: 5th on mIoU but last on mAP50 --- clearest evidence of metric divergence.}
 \end{tabular}
 \end{table}
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{fig3_metric_divergence}
-  \caption{Metric divergence analysis. \textbf{Left}: scatter plot of mIoU vs mAP50 per strategy; points below the diagonal perform better on mAP50 than mIoU. \textbf{Right}: bump chart showing rank positions under each metric; crossing lines indicate rank swaps. The bold rose line highlights the random\_crop anomaly (5th on mIoU, last on mAP50 --- a 3-rank gap), providing the clearest empirical evidence that the two metrics measure fundamentally different model capabilities.}
+  \caption{Metric divergence analysis. \textbf{Left}: scatter plot of mIoU vs mAP50 per strategy; points below the diagonal perform better on mAP50 than on mIoU. \textbf{Right}: bump chart showing rank positions under each metric; crossing lines indicate rank swaps. The bold rose line highlights the random\_crop anomaly (5th on mIoU, last on mAP50), providing the clearest empirical evidence that the two metrics measure fundamentally different model capabilities.}
   \label{fig:metric_divergence}
 \end{figure}
 
-Four of the six strategies swap rank between the two metrics. The most striking inversion is random\_crop, which appears reasonable under mIoU (ranking above baseline) while being the worst-performing strategy on instance detection. This has a direct methodological implication: prior PlantSeg benchmarks, which report mIoU exclusively, may have unknowingly favored strategies that perform well on pixel coverage while failing on instance-level tasks.
+Four of the six strategies change rank position between the two metrics. The most striking divergence is random\_crop, which appears adequate under mIoU (ranking above baseline) while being the worst-performing strategy on instance detection. This has a direct methodological implication: prior PlantSeg benchmarks, which report mIoU exclusively, may have unknowingly favored strategies that perform well on pixel coverage while failing on instance-level tasks.
 
 \section{Discussion}
 \label{sec:discussion}
 
 \subsection{Disease-Aware Preprocessing as a Modeling Decision}
-Our results demonstrate that spatial preprocessing is not a neutral preprocessing choice but a substantive modeling decision with measurable performance consequences. The transition from annotation-free cropping (random\_crop, center\_crop, baseline) to annotation-guided cropping (bbox\_guided, mask\_guided) produces consistent, large improvements ($+$6 pp on mIoU). This finding is consistent with the broader literature on region-focused training in object detection \citep{zoph2020learning, cubuk2020randaugment}: providing the model with spatially relevant views of the target accelerates learning and improves final accuracy. In the plant disease domain, where symptoms occupy a small, variable fraction of the image and background is highly complex, this effect is amplified.
+Our results demonstrate that spatial preprocessing is not a neutral choice but a substantive modeling decision with measurable performance consequences. The transition from annotation-free cropping (random\_crop, center\_crop, baseline) to annotation-guided cropping (bbox\_guided, mask\_guided) produces consistent, large improvements ($+$6 pp on mIoU). This finding is consistent with the broader literature on region-focused training in object detection \citep{zoph2020learning, cubuk2020randaugment}: providing the model with spatially relevant views of the target accelerates learning and improves final accuracy. In the plant disease domain, where symptoms occupy a small, variable fraction of the image and background is highly complex, this effect is amplified. Recent YOLO-based detection studies on in-the-wild agricultural imagery report similar patterns, where annotation-aware training protocols consistently outperform naive augmentation pipelines \citep{miao2025serpensgate}.
 
 \subsection{The Diagnostic Value of the Lesion Boundary}
 The failure of mask\_guided\_aware relative to mask\_guided reveals that the perceptual boundary between healthy and diseased tissue is an active learning signal. This finding is consistent with observations in medical image segmentation, where context around lesions has been identified as diagnostically informative \citep{chen2021transunet}. Plant pathologists rely on this same boundary for manual diagnosis: the transition zone between healthy green tissue and necrotic or chlorotic regions often carries pathogen-specific visual signatures (e.g., the chlorotic halo of bacterial diseases, the powdery white margin of \textit{Erysiphe} infections). By preserving this context, mask\_guided allows the model to internalize these diagnostic cues. Strategies that suppress this boundary --- even in well-intentioned attempts to focus attention on the lesion interior --- remove information that the model would otherwise leverage.
 
 \subsection{Instance vs. Pixel Metrics in Plant Pathology}
-The empirical proof that mIoU and mAP50 rank preprocessing strategies differently has direct consequences for the plant pathology AI community. Applications involving disease \emph{severity quantification} (e.g., what fraction of the canopy is diseased) are naturally served by pixel-level metrics. Applications involving disease \emph{incidence monitoring} (e.g., how many individual lesions are present, which plants show early-stage symptoms) require instance-level metrics. Publishing only one metric obscures the model's capability profile. We recommend that future plant disease segmentation benchmarks report both mIoU and mAP50 as complementary, non-redundant indicators.
+The empirical proof that mIoU and mAP50 rank preprocessing strategies differently has direct consequences for the plant pathology AI community. Applications involving disease \emph{severity quantification} (e.g., what fraction of the canopy is diseased) are naturally served by pixel-level metrics. Applications involving disease \emph{incidence monitoring} (e.g., how many individual lesions are present, which plants show early-stage symptoms) require instance-level metrics. Publishing only one metric obscures the model's capability profile \citep{rethink2021segeval}. We recommend that future plant disease segmentation benchmarks report both mIoU and mAP50 as complementary, non-redundant indicators.
 
 \subsection{Practical Implications for Annotation Investment}
-The near-equivalence of bbox\_guided and mask\_guided under both metrics has direct practical implications. Bounding box annotation requires significantly less expert time than polygon annotation \citep{khoreva2017simple}, and our results show that this lower-cost annotation achieves better mIoU. For resource-limited research groups or agricultural organizations without access to expert annotators, this finding suggests that investing in bounding box annotation --- combined with disease-aware cropping preprocessing --- is both sufficient and cost-effective for achieving strong segmentation performance. Expensive polygon annotation provides marginal gains only when mAP50 under instance-level detection is the primary criterion.
+The near-equivalence of bbox\_guided and mask\_guided under both metrics has direct practical implications. Bounding box annotation requires significantly less expert time than polygon annotation \citep{khoreva2017simple}, and our results show that this lower-cost annotation achieves better mIoU. For resource-limited research groups or agricultural organizations without access to expert annotators, this finding suggests that investing in bounding box annotation --- combined with disease-aware cropping preprocessing --- is both sufficient and cost-effective for achieving strong segmentation performance. Expensive polygon annotation provides marginal gains only when instance-level detection (mAP50) is the primary criterion. This aligns with broader trends toward annotation-efficient learning \citep{xu2023embracinglimitedand, mullins2024leveragingzeroshotdetection}.
 
 \subsection{Limitations and Future Work}
-All experiments use a single random seed; multi-seed validation (seeds 123 and 456) on the top three strategies is pending and constitutes the primary remaining validation requirement before submission. Convergence curves across 200 epochs are available and show a notable crossover at epoch 34 for mask\_guided\_aware vs. mask\_guided, consistent with the hypothesis that context-suppression augmentation accelerates early learning at the cost of asymptotic performance. Future work will investigate three directions: (1) per-class mAP analysis to identify which disease categories benefit most from annotation-guided preprocessing; (2) extension to YOLOv11n-seg and YOLOv11l-seg to understand how preprocessing effects interact with model capacity; and (3) domain adaptation studies to assess whether preprocessing insights transfer across crop species and geographic regions.
+The present study evaluates all strategies with a single training run (seed 42). While the convergence curves (Figure~\ref{fig:convergence}) show stable and consistent trends over 200 epochs across strategies, the absolute performance differences are small enough that future work should confirm robustness across multiple initialization seeds. Future work will investigate three directions: (1) per-class mAP analysis to identify which disease categories benefit most from annotation-guided preprocessing; (2) extension to YOLOv11n-seg and YOLOv11l-seg to understand how preprocessing effects interact with model capacity; and (3) domain adaptation studies to assess whether preprocessing insights transfer across crop species and geographic regions \citep{wu2023fromlaboratoryto}.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented a systematic study of six preprocessing strategies for plant disease instance segmentation on PlantSeg, the largest in-the-wild plant disease segmentation benchmark available. Using YOLOv11m-seg on a single A100 GPU, we established the first instance segmentation baseline on this dataset and produced four principal findings.
+We presented a systematic study of six preprocessing strategies for plant disease instance segmentation on PlantSeg \citep{plantseg2024}, the largest in-the-wild plant disease segmentation benchmark available. Using YOLOv11m-seg on a single A100 GPU, we established the first instance segmentation baseline on this dataset and produced four principal findings.
 
-Bounding-box-guided preprocessing achieves 34.12\% mIoU --- surpassing DeepLabv3+ ResNet-101 (27.18\%) and approaching SAN ViT-B/16 (34.79\%) at 3$\times$ lower parameter cost --- demonstrating that disease-aware spatial preprocessing with low-cost annotations closes the gap to more expensive prior approaches. The near-equivalent performance of bbox\_guided and mask\_guided (margin $<$0.5 pp on both metrics) shows that expensive polygon annotation is not justified when pixel-level disease quantification is the primary goal.
+Bounding-box-guided preprocessing achieves 34.12\% mIoU --- surpassing DeepLabv3+ ResNet-101 (27.18\%) and approaching SAN ViT-B/16 (34.79\%) at $\sim$4$\times$ lower parameter cost --- demonstrating that disease-aware spatial preprocessing with low-cost annotations closes the gap to more expensive prior approaches. The near-equivalent performance of bbox\_guided and mask\_guided (margin $<$0.5 pp on both metrics) shows that expensive polygon annotation is not justified when pixel-level disease quantification is the primary goal.
 
-The degradation of mask\_guided\_aware relative to mask\_guided reveals that the healthy-to-necrotic tissue boundary is a diagnostically active feature signal that the model exploits for boundary delineation. Suppressing this context, even with well-motivated augmentation, reduces final performance.
+The degradation of mask\_guided\_aware relative to mask\_guided reveals that the healthy-to-necrotic tissue boundary is a diagnostically active feature signal that the model exploits for boundary delineation. Suppressing this context, even with well-motivated augmentation, reduces performance on both metrics.
 
 The random\_crop anomaly --- ranking fifth on mIoU while last on mAP50 --- provides the clearest empirical evidence that mIoU and mAP50 measure fundamentally different model capabilities. We recommend that future plant disease segmentation work adopt dual-metric evaluation as a standard practice, as pixel-level metrics alone can conceal critical instance-level failure modes.
 
-Taken together, these findings provide actionable guidance for practitioners: invest in annotation-guided preprocessing, preserve lesion boundary context, and always evaluate on both pixel-level and instance-level metrics. Completing multi-seed validation will further solidify these conclusions in preparation for journal submission.
+Taken together, these findings provide actionable guidance for practitioners: invest in annotation-guided preprocessing, preserve lesion boundary context, and always evaluate on both pixel-level and instance-level metrics.
 
 \bibliographystyle{elsarticle-harv}
 \bibliography{biblio}
